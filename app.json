@@ -1,0 +1,90 @@
+{
+    "expo": {
+        "name": "TimeSure",
+        "slug": "timesure",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "scheme": "timesure",
+        "userInterfaceStyle": "light",
+        "splash": {
+            "image": "./assets/images/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#0C831F"
+        },
+        "assetBundlePatterns": [
+            "**/*"
+        ],
+        "ios": {
+            "supportsTablet": false,
+            "bundleIdentifier": "com.timesure.app",
+            "infoPlist": {
+                "NSLocationWhenInUseUsageDescription": "TimeSure needs your location to show nearby stores and deliver to your address.",
+                "NSLocationAlwaysUsageDescription": "TimeSure uses your location for real-time delivery tracking.",
+                "NSCameraUsageDescription": "TimeSure needs camera access to upload your profile photo.",
+                "NSPhotoLibraryUsageDescription": "TimeSure needs photo library access to select your profile photo."
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/adaptive-icon.png",
+                "backgroundColor": "#0C831F"
+            },
+            "permissions": [
+                "ACCESS_FINE_LOCATION",
+                "ACCESS_COARSE_LOCATION",
+                "CAMERA",
+                "READ_EXTERNAL_STORAGE",
+                "WRITE_EXTERNAL_STORAGE",
+                "RECEIVE_BOOT_COMPLETED",
+                "VIBRATE"
+            ],
+            "package": "com.timesure.app"
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/favicon.png"
+        },
+        "plugins": [
+            "expo-router",
+            "expo-font",
+            [
+                "expo-location",
+                {
+                    "locationAlwaysAndWhenInUsePermission": "Allow TimeSure to use your location."
+                }
+            ],
+            [
+                "expo-notifications",
+                {
+                    "icon": "./assets/images/notification-icon.png",
+                    "color": "#0C831F",
+                    "sounds": []
+                }
+            ],
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "The app accesses your photos to let you share them with your friends."
+                }
+            ],
+            "expo-secure-store"
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "eas": {
+                "projectId": "YOUR_EAS_PROJECT_ID"
+            },
+            "firebaseApiKey": "YOUR_FIREBASE_API_KEY",
+            "firebaseAuthDomain": "YOUR_PROJECT.firebaseapp.com",
+            "firebaseProjectId": "YOUR_PROJECT_ID",
+            "firebaseStorageBucket": "YOUR_PROJECT.appspot.com",
+            "firebaseMessagingSenderId": "YOUR_SENDER_ID",
+            "firebaseAppId": "YOUR_APP_ID",
+            "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+        }
+    }
+}

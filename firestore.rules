@@ -1,0 +1,113 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // === Helper Functions ===
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+
+    function isDeliveryPartner() {
+      return isAuthenticated() && getUserRole() == 'delivery';
+    }
+
+    function isUser() {
+      return isAuthenticated() && getUserRole() == 'user';
+    }
+
+    // === Users Collection ===
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // === Products Collection ===
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // === Categories Collection ===
+    match /categories/{categoryId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // === Orders Collection ===
+    match /orders/{orderId} {
+      // Users can only see their own orders
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid ||
+         resource.data.deliveryPartnerId == request.auth.uid ||
+         isAdmin());
+
+      // Only authenticated users can create orders for themselves
+      allow create: if isUser() &&
+        request.resource.data.userId == request.auth.uid;
+
+      // Users can cancel; delivery partners can update status; admins can do anything
+      allow update: if isAuthenticated() &&
+        (
+          // User can only cancel their order
+          (isUser() && resource.data.userId == request.auth.uid &&
+           request.resource.data.status == 'cancelled') ||
+          // Delivery partner can update status fields only
+          (isDeliveryPartner() &&
+           resource.data.deliveryPartnerId == request.auth.uid) ||
+          isAdmin()
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    // === Delivery Partners Collection ===
+    match /deliveryPartners/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // === Coupons Collection ===
+    match /coupons/{code} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // === Banners Collection ===
+    match /banners/{bannerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // === Wallet Collection ===
+    match /wallets/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      // Only Cloud Functions should update wallet balance directly,
+      // preventing client-side manipulation
+      allow update: if isAdmin();
+    }
+
+    // === Notifications Collection ===
+    match /notifications/{uid}/items/{notifId} {
+      allow read: if isOwner(uid);
+      allow write: if isOwner(uid) || isAdmin();
+    }
+  }
+}

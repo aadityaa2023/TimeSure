@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "755004706807",
+    "project_id": "timesure-26",
+    "storage_bucket": "timesure-26.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755004706807:android:c18d9274e979df0913a8f2",
+        "android_client_info": {
+          "package_name": "com.timesure.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755004706807-nefeiuabhpsohh56sgjnmnp2bkt2huvq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH3lqGAbx3pyInwGUCxC3jFdXTxJBIy0k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755004706807-nefeiuabhpsohh56sgjnmnp2bkt2huvq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
