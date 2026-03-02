@@ -39,7 +39,8 @@
                 "RECEIVE_BOOT_COMPLETED",
                 "VIBRATE"
             ],
-            "package": "com.timesure.app"
+            "package": "com.timesure.app",
+            "googleServicesFile": "./google-services.json"
         },
         "web": {
             "bundler": "metro",
@@ -53,14 +54,6 @@
                 "expo-location",
                 {
                     "locationAlwaysAndWhenInUsePermission": "Allow TimeSure to use your location."
-                }
-            ],
-            [
-                "expo-notifications",
-                {
-                    "icon": "./assets/images/notification-icon.png",
-                    "color": "#0C831F",
-                    "sounds": []
                 }
             ],
             [
@@ -78,12 +71,12 @@
             "eas": {
                 "projectId": "YOUR_EAS_PROJECT_ID"
             },
-            "firebaseApiKey": "YOUR_FIREBASE_API_KEY",
-            "firebaseAuthDomain": "YOUR_PROJECT.firebaseapp.com",
-            "firebaseProjectId": "YOUR_PROJECT_ID",
-            "firebaseStorageBucket": "YOUR_PROJECT.appspot.com",
-            "firebaseMessagingSenderId": "YOUR_SENDER_ID",
-            "firebaseAppId": "YOUR_APP_ID",
+            "firebaseApiKey": "AIzaSyCH3lqGAbx3pyInwGUCxC3jFdXTxJBIy0k",
+            "firebaseAuthDomain": "timesure-26.firebaseapp.com",
+            "firebaseProjectId": "timesure-26",
+            "firebaseStorageBucket": "timesure-26.firebasestorage.app",
+            "firebaseMessagingSenderId": "755004706807",
+            "firebaseAppId": "1:755004706807:android:c18d9274e979df0913a8f2",
             "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY"
         }
     }

@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import * as SplashScreen from 'expo-splash-screen';
-import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
 import { useAuthStore } from '@/stores/authStore';
 import { subscribeToAuthState, getUserProfile } from '@/services/auth.service';
@@ -20,17 +19,6 @@ const queryClient = new QueryClient({
             retry: 2,
         },
     },
-});
-
-// Configure notification handler
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-        shouldShowBanner: true,
-        shouldShowList: true,
-    }),
 });
 
 export default function RootLayout() {
