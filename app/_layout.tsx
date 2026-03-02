@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Stack, router } from 'expo-router';
+import { Stack, router, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -9,6 +9,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { useAuthStore } from '@/stores/authStore';
 import { subscribeToAuthState, getUserProfile } from '@/services/auth.service';
+import { MD3LightTheme, PaperProvider, configureFonts } from 'react-native-paper';
+import { useState } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,8 +23,26 @@ const queryClient = new QueryClient({
     },
 });
 
+const fontConfig = {
+    fontFamily: 'Poppins-Regular',
+};
+
+const blinkitTheme = {
+    ...MD3LightTheme,
+    colors: {
+        ...MD3LightTheme.colors,
+        primary: '#F8CB46',
+        secondary: '#0C831F', // Often used for delivery estimates / money
+        background: '#FFFFFF',
+        surface: '#FFFFFF',
+        text: '#000000',
+    },
+};
+
 export default function RootLayout() {
     const { setUser, setLoading, role } = useAuthStore();
+    const [initialRoute, setInitialRoute] = useState<string | null>(null);
+    const navigationState = useRootNavigationState();
 
     const [fontsLoaded] = useFonts({
         'Poppins-Light': require('../assets/fonts/Poppins-Light.ttf'),
@@ -34,7 +54,7 @@ export default function RootLayout() {
 
     useEffect(() => {
         if (fontsLoaded) {
-            SplashScreen.hideAsync();
+            SplashScreen.hideAsync().catch(() => { });
         }
     }, [fontsLoaded]);
 
@@ -46,24 +66,30 @@ export default function RootLayout() {
                     setUser(profile);
                     // Route based on role
                     if (profile.role === 'admin') {
-                        router.replace('/(admin)');
+                        setInitialRoute('/(admin)');
                     } else if (profile.role === 'delivery') {
-                        router.replace('/(delivery)');
+                        setInitialRoute('/(delivery)');
                     } else {
-                        router.replace('/(user)');
+                        setInitialRoute('/(user)');
                     }
                 } else {
                     // New user: go to profile setup
-                    router.replace('/(auth)/profile-setup');
+                    setInitialRoute('/(auth)/profile-setup');
                 }
             } else {
                 setUser(null);
-                router.replace('/(auth)');
+                setInitialRoute('/(auth)');
             }
             setLoading(false);
         });
         return unsubscribe;
     }, []);
+
+    useEffect(() => {
+        if (!fontsLoaded || !navigationState?.key || !initialRoute) return;
+        router.replace(initialRoute as any);
+        setInitialRoute(null);
+    }, [fontsLoaded, navigationState?.key, initialRoute]);
 
     if (!fontsLoaded) return null;
 
@@ -71,14 +97,16 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
                 <QueryClientProvider client={queryClient}>
-                    <StatusBar style="auto" />
-                    <Stack screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name="(auth)" />
-                        <Stack.Screen name="(user)" />
-                        <Stack.Screen name="(delivery)" />
-                        <Stack.Screen name="(admin)" />
-                    </Stack>
-                    <Toast />
+                    <PaperProvider theme={blinkitTheme}>
+                        <StatusBar style="auto" />
+                        <Stack screenOptions={{ headerShown: false }}>
+                            <Stack.Screen name="(auth)" />
+                            <Stack.Screen name="(user)" />
+                            <Stack.Screen name="(delivery)" />
+                            <Stack.Screen name="(admin)" />
+                        </Stack>
+                        <Toast />
+                    </PaperProvider>
                 </QueryClientProvider>
             </SafeAreaProvider>
         </GestureHandlerRootView>
