@@ -5,6 +5,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -88,51 +89,58 @@ export default function LoginScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <LinearGradient colors={['#0C831F', '#34A853']} style={styles.logoCircle}>
-                        <MaterialIcons name="flash-on" size={48} color="#fff" />
-                    </LinearGradient>
-                    <Text style={styles.appName}>TimeSure</Text>
-                    <Text style={styles.tagline}>Delivery in 10 minutes</Text>
-                </View>
-
-                {/* Dev login notice */}
-                <View style={styles.devBadge}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        <MaterialIcons name="build" size={16} color="#F57F17" />
-                        <Text style={styles.devText}>Dev Mode — No credentials required</Text>
-                    </View>
-                </View>
-
-                {/* Role cards */}
-                <Text style={styles.pickLabel}>Continue as</Text>
-                {ROLES.map(item => (
-                    <TouchableOpacity
-                        key={item.role}
-                        style={styles.card}
-                        onPress={() => handleRoleSelect(item.role)}
-                        activeOpacity={0.85}
-                    >
-                        <LinearGradient
-                            colors={item.colors}
-                            style={styles.cardGradient}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                        >
-                            <MaterialIcons name={item.icon} size={36} color="#fff" />
-                            <View style={styles.cardText}>
-                                <Text style={styles.cardLabel}>{item.label}</Text>
-                                <Text style={styles.cardDesc}>{item.desc}</Text>
-                            </View>
-                            {isAuthenticating === item.role ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <MaterialIcons name="arrow-forward" size={24} color="#fff" />
-                            )}
+                <View style={Platform.OS === 'web' ? styles.webContainer : styles.mobileContainer}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <LinearGradient colors={['#0C831F', '#34A853']} style={styles.logoCircle}>
+                            <MaterialIcons name="flash-on" size={48} color="#fff" />
                         </LinearGradient>
-                    </TouchableOpacity>
-                ))}
+                        <Text style={styles.appName}>TimeSure</Text>
+                        <Text style={styles.tagline}>Delivery in 10 minutes</Text>
+                    </View>
+
+                    {/* Dev login notice */}
+                    <View style={styles.devBadge}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <MaterialIcons name="build" size={16} color="#F57F17" />
+                            <Text style={styles.devText}>Dev Mode — No credentials required</Text>
+                        </View>
+                    </View>
+
+                    {/* Role cards */}
+                    <Text style={styles.pickLabel}>Continue as</Text>
+                    {ROLES.map(item => (
+                        <TouchableOpacity
+                            key={item.role}
+                            style={styles.card}
+                            onPress={() => handleRoleSelect(item.role)}
+                            activeOpacity={0.85}
+                            // @ts-ignore
+                            style={[
+                                styles.card,
+                                Platform.OS === 'web' && { cursor: 'pointer' }
+                            ]}
+                        >
+                            <LinearGradient
+                                colors={item.colors}
+                                style={styles.cardGradient}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                            >
+                                <MaterialIcons name={item.icon} size={36} color="#fff" />
+                                <View style={styles.cardText}>
+                                    <Text style={styles.cardLabel}>{item.label}</Text>
+                                    <Text style={styles.cardDesc}>{item.desc}</Text>
+                                </View>
+                                {isAuthenticating === item.role ? (
+                                    <ActivityIndicator color="#fff" />
+                                ) : (
+                                    <MaterialIcons name="arrow-forward" size={24} color="#fff" />
+                                )}
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    ))}
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -145,6 +153,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: Spacing['2xl'],
         paddingTop: Spacing['4xl'],
         paddingBottom: Spacing['2xl'],
+    },
+    webContainer: {
+        width: '100%',
+        maxWidth: 500,
+        alignSelf: 'center',
+    },
+    mobileContainer: {
+        width: '100%',
     },
     header: { alignItems: 'center', marginBottom: Spacing['2xl'] },
     logoCircle: {

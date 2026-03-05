@@ -6,6 +6,7 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
@@ -35,18 +36,27 @@ export default function ProfileScreen() {
     const { user, logout } = useAuthStore();
 
     const handleLogout = () => {
-        Alert.alert('Logout', 'Are you sure you want to logout?', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Logout',
-                style: 'destructive',
-                onPress: async () => {
-                    await signOutUser();
+        if (Platform.OS === 'web') {
+            if (window.confirm('Are you sure you want to logout?')) {
+                signOutUser().then(() => {
                     logout();
                     router.replace('/(auth)');
+                });
+            }
+        } else {
+            Alert.alert('Logout', 'Are you sure you want to logout?', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: async () => {
+                        await signOutUser();
+                        logout();
+                        router.replace('/(auth)');
+                    },
                 },
-            },
-        ]);
+            ]);
+        }
     };
 
     const initials = user?.name
@@ -56,72 +66,90 @@ export default function ProfileScreen() {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Profile Header */}
-                <LinearGradient colors={['#0C831F', '#34A853']} style={styles.profileHeader}>
-                    <View style={styles.avatarWrap}>
-                        {user?.photoURL ? (
-                            <Image source={{ uri: user.photoURL }} style={styles.avatar} contentFit="cover" />
-                        ) : (
-                            <View style={styles.avatarPlaceholder}>
-                                <Text style={styles.avatarInitials}>{initials}</Text>
-                            </View>
-                        )}
-                    </View>
-                    <Text style={styles.userName}>{user?.name ?? 'User'}</Text>
-                    <Text style={styles.userPhone}>{user?.phone}</Text>
-                    <TouchableOpacity style={styles.editBtn}>
-                        <MaterialCommunityIcons name="pencil-outline" size={14} color="#fff" />
-                        <Text style={styles.editBtnText}>Edit Profile</Text>
-                    </TouchableOpacity>
-                </LinearGradient>
-
-                {/* Stats */}
-                <View style={styles.statsRow}>
-                    <View style={styles.statCard}>
-                        <Text style={styles.statNum}>0</Text>
-                        <Text style={styles.statLabel}>Orders</Text>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statCard}>
-                        <Text style={styles.statNum}>₹0</Text>
-                        <Text style={styles.statLabel}>Saved</Text>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statCard}>
-                        <View style={styles.ratingRow}>
-                            <MaterialCommunityIcons name="star" size={16} color="#F59E0B" />
-                            <Text style={styles.statNum}> 4.9</Text>
+                <View style={Platform.OS === 'web' ? styles.webContainer : styles.mobileContainer}>
+                    {/* Profile Header */}
+                    <LinearGradient colors={['#0C831F', '#34A853']} style={styles.profileHeader}>
+                        <View style={styles.avatarWrap}>
+                            {user?.photoURL ? (
+                                <Image source={{ uri: user.photoURL }} style={styles.avatar} contentFit="cover" />
+                            ) : (
+                                <View style={styles.avatarPlaceholder}>
+                                    <Text style={styles.avatarInitials}>{initials}</Text>
+                                </View>
+                            )}
                         </View>
-                        <Text style={styles.statLabel}>Rating</Text>
-                    </View>
-                </View>
-
-                {/* Menu */}
-                <View style={styles.menuSection}>
-                    {menuItems.map((item, i) => (
+                        <Text style={styles.userName}>{user?.name ?? 'User'}</Text>
+                        <Text style={styles.userPhone}>{user?.phone}</Text>
                         <TouchableOpacity
-                            key={i}
-                            style={[styles.menuItem, i < menuItems.length - 1 && styles.menuItemBorder]}
-                            onPress={() => item.route && router.push(item.route as any)}
-                            activeOpacity={0.7}
+                            style={[
+                                styles.editBtn,
+                                Platform.OS === 'web' && { cursor: 'pointer' } as any
+                            ]}
                         >
-                            <View style={[styles.menuIconCircle, { backgroundColor: item.iconBg }]}>
-                                <MaterialCommunityIcons name={item.icon} size={18} color="#555" />
-                            </View>
-                            <Text style={styles.menuLabel}>{item.label}</Text>
-                            <MaterialCommunityIcons name="chevron-right" size={20} color="#BDBDBD" />
+                            <MaterialCommunityIcons name="pencil-outline" size={14} color="#fff" />
+                            <Text style={styles.editBtnText}>Edit Profile</Text>
                         </TouchableOpacity>
-                    ))}
+                    </LinearGradient>
+
+                    {/* Stats */}
+                    <View style={styles.statsRow}>
+                        <View style={styles.statCard}>
+                            <Text style={styles.statNum}>0</Text>
+                            <Text style={styles.statLabel}>Orders</Text>
+                        </View>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statCard}>
+                            <Text style={styles.statNum}>₹0</Text>
+                            <Text style={styles.statLabel}>Saved</Text>
+                        </View>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statCard}>
+                            <View style={styles.ratingRow}>
+                                <MaterialCommunityIcons name="star" size={16} color="#F59E0B" />
+                                <Text style={styles.statNum}> 4.9</Text>
+                            </View>
+                            <Text style={styles.statLabel}>Rating</Text>
+                        </View>
+                    </View>
+
+                    {/* Menu */}
+                    <View style={styles.menuSection}>
+                        {menuItems.map((item, i) => (
+                            <TouchableOpacity
+                                key={i}
+                                style={[
+                                    styles.menuItem,
+                                    i < menuItems.length - 1 && styles.menuItemBorder,
+                                    Platform.OS === 'web' && { cursor: 'pointer' } as any
+                                ]}
+                                onPress={() => item.route && router.push(item.route as any)}
+                                activeOpacity={0.7}
+                            >
+                                <View style={[styles.menuIconCircle, { backgroundColor: item.iconBg }]}>
+                                    <MaterialCommunityIcons name={item.icon} size={18} color="#555" />
+                                </View>
+                                <Text style={styles.menuLabel}>{item.label}</Text>
+                                <MaterialCommunityIcons name="chevron-right" size={20} color="#BDBDBD" />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    {/* Logout */}
+                    <TouchableOpacity
+                        style={[
+                            styles.logoutBtn,
+                            Platform.OS === 'web' && { cursor: 'pointer' } as any
+                        ]}
+                        onPress={handleLogout}
+                        activeOpacity={0.8}
+                    >
+                        <MaterialCommunityIcons name="logout" size={18} color={Colors.error} style={{ marginRight: 8 }} />
+                        <Text style={styles.logoutText}>Logout</Text>
+                    </TouchableOpacity>
+
+                    <Text style={styles.version}>TimeSure v1.0.0</Text>
+                    <View style={{ height: 80 }} />
                 </View>
-
-                {/* Logout */}
-                <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
-                    <MaterialCommunityIcons name="logout" size={18} color={Colors.error} style={{ marginRight: 8 }} />
-                    <Text style={styles.logoutText}>Logout</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.version}>TimeSure v1.0.0</Text>
-                <View style={{ height: 80 }} />
             </ScrollView>
         </SafeAreaView>
     );
@@ -129,6 +157,14 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: Colors.background },
+    webContainer: {
+        width: '100%',
+        maxWidth: 600,
+        alignSelf: 'center',
+    },
+    mobileContainer: {
+        width: '100%',
+    },
     profileHeader: {
         alignItems: 'center',
         paddingTop: Spacing['2xl'],

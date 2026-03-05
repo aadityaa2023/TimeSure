@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { useEffect } from 'react';
 import { Stack, router, useRootNavigationState } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -70,7 +71,7 @@ export default function RootLayout() {
     if (!fontsLoaded) return null;
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1, width: '100%', height: '100%' }}>
             <SafeAreaProvider>
                 <QueryClientProvider client={queryClient}>
                     <PaperProvider theme={blinkitTheme}>

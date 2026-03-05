@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOutUser } from '@/services/auth.service';
@@ -22,7 +22,15 @@ export default function DeliveryProfileScreen() {
                 </View>
                 <TouchableOpacity
                     style={styles.logoutBtn}
-                    onPress={async () => { await signOutUser(); logout(); router.replace('/(auth)'); }}
+                    onPress={async () => {
+                        if (Platform.OS === 'web') {
+                            if (window.confirm('Are you sure you want to logout?')) {
+                                await signOutUser(); logout(); router.replace('/(auth)');
+                            }
+                        } else {
+                            await signOutUser(); logout(); router.replace('/(auth)');
+                        }
+                    }}
                 >
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                         <MaterialIcons name="logout" size={20} color={Colors.error} />

@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     FlatList,
     ViewToken,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -52,11 +53,13 @@ export default function OnboardingScreen() {
     const flatListRef = useRef<FlatList>(null);
     const scrollX = useSharedValue(0);
 
-    const onViewableItemsChanged = ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
         if (viewableItems.length > 0) {
             setActiveIndex(viewableItems[0].index ?? 0);
         }
-    };
+    }).current;
+
+    const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 }).current;
 
     const handleNext = () => {
         if (activeIndex < slides.length - 1) {
@@ -79,24 +82,29 @@ export default function OnboardingScreen() {
                 keyExtractor={item => item.id}
                 onScrollToIndexFailed={() => { }}
                 onViewableItemsChanged={onViewableItemsChanged}
-                viewabilityConfig={{ itemVisiblePercentThreshold: 60 }}
+                viewabilityConfig={viewabilityConfig}
                 renderItem={({ item }) => (
                     <LinearGradient colors={item.bg} style={styles.slide}>
-                        <TouchableOpacity
-                            style={styles.skipBtn}
-                            onPress={handleSkip}
-                            activeOpacity={0.7}
-                        >
-                            <Text style={styles.skipText}>Skip</Text>
-                        </TouchableOpacity>
+                        <View style={Platform.OS === 'web' ? styles.webContainer : styles.mobileContainer}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.skipBtn,
+                                    Platform.OS === 'web' && { cursor: 'pointer' } as any
+                                ]}
+                                onPress={handleSkip}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.skipText}>Skip</Text>
+                            </TouchableOpacity>
 
-                        <View style={styles.emojiContainer}>
-                            <MaterialIcons name={item.icon} size={80} color="#fff" />
-                        </View>
+                            <View style={styles.emojiContainer}>
+                                <MaterialIcons name={item.icon} size={80} color="#fff" />
+                            </View>
 
-                        <View style={styles.textContainer}>
-                            <Text style={styles.title}>{item.title}</Text>
-                            <Text style={styles.subtitle}>{item.subtitle}</Text>
+                            <View style={styles.textContainer}>
+                                <Text style={styles.title}>{item.title}</Text>
+                                <Text style={styles.subtitle}>{item.subtitle}</Text>
+                            </View>
                         </View>
                     </LinearGradient>
                 )}
@@ -104,41 +112,46 @@ export default function OnboardingScreen() {
 
             {/* Pagination Dots */}
             <View style={styles.bottomContainer}>
-                <View style={styles.dots}>
-                    {slides.map((_, index) => (
-                        <View
-                            key={index}
-                            style={[
-                                styles.dot,
-                                { width: activeIndex === index ? 24 : 8, opacity: activeIndex === index ? 1 : 0.4 },
-                            ]}
-                        />
-                    ))}
-                </View>
-
-                <TouchableOpacity
-                    style={styles.nextButton}
-                    onPress={handleNext}
-                    activeOpacity={0.85}
-                >
-                    <LinearGradient
-                        colors={['#0C831F', '#34A853']}
-                        style={styles.nextGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                    >
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <Text style={styles.nextText}>
-                                {activeIndex === slides.length - 1 ? 'Get Started' : 'Next'}
-                            </Text>
-                            <MaterialIcons
-                                name={activeIndex === slides.length - 1 ? 'auto-awesome' : 'arrow-forward'}
-                                size={20}
-                                color="#fff"
+                <View style={[styles.bottomInnerContainer, Platform.OS === 'web' && styles.webContainer]}>
+                    <View style={styles.dots}>
+                        {slides.map((_, index) => (
+                            <View
+                                key={index}
+                                style={[
+                                    styles.dot,
+                                    { width: activeIndex === index ? 24 : 8, opacity: activeIndex === index ? 1 : 0.4 },
+                                ]}
                             />
-                        </View>
-                    </LinearGradient>
-                </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <TouchableOpacity
+                        style={[
+                            styles.nextButton,
+                            Platform.OS === 'web' && { cursor: 'pointer' } as any
+                        ]}
+                        onPress={handleNext}
+                        activeOpacity={0.85}
+                    >
+                        <LinearGradient
+                            colors={['#0C831F', '#34A853']}
+                            style={styles.nextGradient}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                        >
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Text style={styles.nextText}>
+                                    {activeIndex === slides.length - 1 ? 'Get Started' : 'Next'}
+                                </Text>
+                                <MaterialIcons
+                                    name={activeIndex === slides.length - 1 ? 'auto-awesome' : 'arrow-forward'}
+                                    size={20}
+                                    color="#fff"
+                                />
+                            </View>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
@@ -146,6 +159,20 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#000' },
+    webContainer: {
+        width: '100%',
+        maxWidth: 500,
+        height: '100%',
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    mobileContainer: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     slide: {
         width,
         height,
@@ -156,7 +183,7 @@ const styles = StyleSheet.create({
     skipBtn: {
         position: 'absolute',
         top: 60,
-        right: Spacing.base,
+        right: Spacing.base, // Reverted to normal right margin since it's aligned to webContainer
         padding: Spacing.sm,
     },
     skipText: {
@@ -197,6 +224,10 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         paddingHorizontal: Spacing['2xl'],
+        alignItems: 'center',
+    },
+    bottomInnerContainer: {
+        width: '100%',
         alignItems: 'center',
         gap: Spacing.lg,
     },

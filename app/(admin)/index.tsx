@@ -6,6 +6,7 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -71,10 +72,19 @@ export default function AdminDashboard() {
     });
 
     const handleLogout = () => {
-        Alert.alert('Logout', 'Logout as admin?', [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Logout', style: 'destructive', onPress: async () => { await signOutUser(); logout(); router.replace('/(auth)'); } },
-        ]);
+        if (Platform.OS === 'web') {
+            if (window.confirm('Logout as admin?')) {
+                signOutUser().then(() => {
+                    logout();
+                    router.replace('/(auth)');
+                });
+            }
+        } else {
+            Alert.alert('Logout', 'Logout as admin?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Logout', style: 'destructive', onPress: async () => { await signOutUser(); logout(); router.replace('/(auth)'); } },
+            ]);
+        }
     };
 
     return (
@@ -94,31 +104,36 @@ export default function AdminDashboard() {
             </LinearGradient>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-                {/* KPI Cards */}
-                <Text style={styles.sectionTitle}>Overview</Text>
-                <View style={styles.kpiGrid}>
-                    <KPICard icon="clipboard-list-outline" label="Total Orders" value={kpis.orders.toString()} gradient={['#0C831F', '#34A853']} />
-                    <KPICard icon="currency-inr" label="Revenue" value={`₹${kpis.revenue.toLocaleString('en-IN')}`} gradient={['#1565C0', '#42A5F5']} />
-                    <KPICard icon="account-group" label="Users" value={kpis.users.toString()} gradient={['#7B1FA2', '#AB47BC']} />
-                    <KPICard icon="package-variant-closed" label="Products" value={kpis.products.toString()} gradient={['#E65100', '#FF7043']} />
-                </View>
+                <View style={Platform.OS === 'web' ? styles.webContainer : styles.mobileContainer}>
+                    {/* KPI Cards */}
+                    <Text style={styles.sectionTitle}>Overview</Text>
+                    <View style={styles.kpiGrid}>
+                        <KPICard icon="clipboard-list-outline" label="Total Orders" value={kpis.orders.toString()} gradient={['#0C831F', '#34A853']} />
+                        <KPICard icon="currency-inr" label="Revenue" value={`₹${kpis.revenue.toLocaleString('en-IN')}`} gradient={['#1565C0', '#42A5F5']} />
+                        <KPICard icon="account-group" label="Users" value={kpis.users.toString()} gradient={['#7B1FA2', '#AB47BC']} />
+                        <KPICard icon="package-variant-closed" label="Products" value={kpis.products.toString()} gradient={['#E65100', '#FF7043']} />
+                    </View>
 
-                {/* Quick Access Menu */}
-                <Text style={styles.sectionTitle}>Quick Access</Text>
-                <View style={styles.menuGrid}>
-                    {adminMenuItems.map((item, i) => (
-                        <TouchableOpacity
-                            key={i}
-                            style={styles.menuItem}
-                            onPress={() => item.route ? router.push(item.route as any) : null}
-                            activeOpacity={0.85}
-                        >
-                            <LinearGradient colors={item.gradient} style={styles.menuGradient}>
-                                <MaterialCommunityIcons name={item.icon} size={26} color="#fff" />
-                            </LinearGradient>
-                            <Text style={styles.menuLabel}>{item.label}</Text>
-                        </TouchableOpacity>
-                    ))}
+                    {/* Quick Access Menu */}
+                    <Text style={styles.sectionTitle}>Quick Access</Text>
+                    <View style={styles.menuGrid}>
+                        {adminMenuItems.map((item, i) => (
+                            <TouchableOpacity
+                                key={i}
+                                style={[
+                                    styles.menuItem,
+                                    Platform.OS === 'web' && { cursor: 'pointer' } as any
+                                ]}
+                                onPress={() => item.route ? router.push(item.route as any) : null}
+                                activeOpacity={0.85}
+                            >
+                                <LinearGradient colors={item.gradient} style={styles.menuGradient}>
+                                    <MaterialCommunityIcons name={item.icon} size={26} color="#fff" />
+                                </LinearGradient>
+                                <Text style={styles.menuLabel}>{item.label}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -127,6 +142,14 @@ export default function AdminDashboard() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: Colors.background },
+    webContainer: {
+        width: '100%',
+        maxWidth: 800,
+        alignSelf: 'center',
+    },
+    mobileContainer: {
+        width: '100%',
+    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',

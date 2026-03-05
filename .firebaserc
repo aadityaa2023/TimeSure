@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "timesure-26"
-  }
+    "default": "timesure-26",
+    "prod": "timesure-26"
+  },
+  "targets": {},
+  "etags": {}
 }
