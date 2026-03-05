@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { createOrder } from '@/services/orders.service';
@@ -30,11 +31,11 @@ const DELIVERY_SLOTS: DeliverySlot[] = [
     { id: '6', label: 'Afternoon', startTime: '12:00 PM', endTime: '04:00 PM', date: TOMORROW, slotsLeft: 18 },
 ];
 
-const PAYMENT_METHODS: { id: PaymentMethod; label: string; emoji: string; description: string }[] = [
-    { id: 'upi', label: 'UPI', emoji: '📱', description: 'Pay via any UPI app (GPay, PhonePe, etc.)' },
-    { id: 'card', label: 'Card', emoji: '💳', description: 'Credit or Debit card' },
-    { id: 'wallet', label: 'Wallet', emoji: '👛', description: 'Pay using TimeSure wallet balance' },
-    { id: 'cod', label: 'Cash on Delivery', emoji: '💵', description: 'Pay when your order arrives' },
+const PAYMENT_METHODS: { id: PaymentMethod; label: string; icon: keyof typeof MaterialIcons.glyphMap; description: string }[] = [
+    { id: 'upi', label: 'UPI', icon: 'smartphone', description: 'Pay via any UPI app (GPay, PhonePe, etc.)' },
+    { id: 'card', label: 'Card', icon: 'credit-card', description: 'Credit or Debit card' },
+    { id: 'wallet', label: 'Wallet', icon: 'account-balance-wallet', description: 'Pay using TimeSure wallet balance' },
+    { id: 'cod', label: 'Cash on Delivery', icon: 'payments', description: 'Pay when your order arrives' },
 ];
 
 export default function CheckoutScreen() {
@@ -105,7 +106,7 @@ export default function CheckoutScreen() {
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backText}>←</Text>
+                    <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Checkout</Text>
                 <View style={{ width: 30 }} />
@@ -114,7 +115,10 @@ export default function CheckoutScreen() {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
                 {/* Delivery Address */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>📍 Delivery Address</Text>
+                    <View style={styles.sectionHeader}>
+                        <MaterialIcons name="location-on" size={20} color={Colors.primary} />
+                        <Text style={styles.sectionTitleText}>Delivery Address</Text>
+                    </View>
                     {selectedAddress ? (
                         <View style={styles.addressCard}>
                             <View style={styles.addressLeft}>
@@ -137,7 +141,10 @@ export default function CheckoutScreen() {
 
                 {/* Delivery Slots */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>🕐 Delivery Slot</Text>
+                    <View style={styles.sectionHeader}>
+                        <MaterialIcons name="access-time" size={20} color={Colors.primary} />
+                        <Text style={styles.sectionTitleText}>Delivery Slot</Text>
+                    </View>
                     <Text style={styles.slotGroupLabel}>Today</Text>
                     <View style={styles.slotsGrid}>
                         {todaySlots.map(slot => (
@@ -179,14 +186,17 @@ export default function CheckoutScreen() {
 
                 {/* Payment Methods */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>💳 Payment Method</Text>
+                    <View style={styles.sectionHeader}>
+                        <MaterialIcons name="credit-card" size={20} color={Colors.primary} />
+                        <Text style={styles.sectionTitleText}>Payment Method</Text>
+                    </View>
                     {PAYMENT_METHODS.map(method => (
                         <TouchableOpacity
                             key={method.id}
                             style={[styles.paymentCard, selectedPayment === method.id && styles.paymentCardSelected]}
                             onPress={() => setSelectedPayment(method.id)}
                         >
-                            <Text style={styles.paymentEmoji}>{method.emoji}</Text>
+                            <MaterialIcons name={method.icon} size={24} color={selectedPayment === method.id ? Colors.primary : Colors.text.secondary} />
                             <View style={styles.paymentInfo}>
                                 <Text style={[styles.paymentLabel, selectedPayment === method.id && styles.paymentLabelSelected]}>
                                     {method.label}
@@ -202,7 +212,10 @@ export default function CheckoutScreen() {
 
                 {/* Bill Summary */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>🧾 Bill Summary</Text>
+                    <View style={styles.sectionHeader}>
+                        <MaterialIcons name="receipt" size={20} color={Colors.primary} />
+                        <Text style={styles.sectionTitleText}>Bill Summary</Text>
+                    </View>
                     <View style={styles.billCard}>
                         <BillRow label="Subtotal" value={`₹${subtotal.toFixed(2)}`} />
                         {couponDiscount > 0 && (
@@ -239,7 +252,10 @@ export default function CheckoutScreen() {
                         {loading ? (
                             <ActivityIndicator color="#fff" />
                         ) : (
-                            <Text style={styles.placeBtnText}>Place Order 🎉</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={styles.placeBtnText}>Place Order</Text>
+                                <MaterialIcons name="celebration" size={20} color="#fff" style={{ marginLeft: 8 }} />
+                            </View>
                         )}
                     </LinearGradient>
                 </TouchableOpacity>
@@ -280,10 +296,18 @@ const styles = StyleSheet.create({
         ...Shadows.sm,
     },
     sectionTitle: {
+        marginBottom: Spacing.base,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.sm,
+        marginBottom: Spacing.base,
+    },
+    sectionTitleText: {
         fontSize: Typography.fontSize.base,
         fontFamily: 'Poppins-Bold',
         color: Colors.text.primary,
-        marginBottom: Spacing.base,
     },
     // Address
     addressCard: {

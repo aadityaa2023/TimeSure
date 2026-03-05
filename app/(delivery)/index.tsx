@@ -16,6 +16,7 @@ import { db } from '@/lib/firebase';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import { useAuthStore } from '@/stores/authStore';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function DeliveryDashboard() {
     const { user } = useAuthStore();
@@ -54,7 +55,10 @@ export default function DeliveryDashboard() {
             {/* Header */}
             <LinearGradient colors={['#1565C0', '#42A5F5']} style={styles.header}>
                 <View style={styles.headerLeft}>
-                    <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0] ?? 'Partner'} 🛵</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Text style={styles.greeting}>Hello, {user?.name?.split(' ')[0] ?? 'Partner'}</Text>
+                        <MaterialIcons name="moped" size={24} color="#fff" />
+                    </View>
                     <Text style={styles.subGreeting}>Ready to earn today?</Text>
                 </View>
                 <View style={styles.onlineToggle}>
@@ -71,9 +75,16 @@ export default function DeliveryDashboard() {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
                 {/* Status Banner */}
                 <View style={[styles.statusBanner, { backgroundColor: isOnline ? Colors.primaryLight : '#FFF3E0' }]}>
-                    <Text style={[styles.statusText, { color: isOnline ? Colors.primary : Colors.warning }]}>
-                        {isOnline ? '✅ You are online and ready to receive orders' : '⚠️ You are offline. Go online to receive orders'}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <MaterialIcons
+                            name={isOnline ? 'check-circle' : 'warning'}
+                            size={18}
+                            color={isOnline ? Colors.primary : Colors.warning}
+                        />
+                        <Text style={[styles.statusText, { color: isOnline ? Colors.primary : Colors.warning }]}>
+                            {isOnline ? 'You are online and ready to receive orders' : 'You are offline. Go online to receive orders'}
+                        </Text>
+                    </View>
                 </View>
 
                 {/* Today Stats */}
@@ -93,14 +104,20 @@ export default function DeliveryDashboard() {
                     </View>
                     <View style={styles.statCard}>
                         <LinearGradient colors={['#7B1FA2', '#AB47BC']} style={styles.statGradient}>
-                            <Text style={styles.statNum}>⭐ {stats.rating}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <MaterialIcons name="star" size={16} color="#fff" />
+                                <Text style={styles.statNum}>{stats.rating}</Text>
+                            </View>
                             <Text style={styles.statLabel}>Rating</Text>
                         </LinearGradient>
                     </View>
                 </View>
 
                 {/* Tips */}
-                <Text style={styles.sectionTitle}>💡 Tips to Earn More</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: Spacing.base, marginTop: Spacing.sm }}>
+                    <MaterialIcons name="lightbulb" size={20} color={Colors.primary} />
+                    <Text style={styles.sectionTitle}>Tips to Earn More</Text>
+                </View>
                 <View style={styles.tipsCard}>
                     {[
                         'Stay online during peak hours (7-10 PM)',

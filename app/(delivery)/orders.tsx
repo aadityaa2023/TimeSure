@@ -16,12 +16,13 @@ import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typograp
 import { useAuthStore } from '@/stores/authStore';
 import { subscribeToDeliveryOrders, updateOrderStatus } from '@/services/orders.service';
 import type { Order } from '@/types';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const DELIVERY_STATUS_FLOW = {
-    confirmed: { next: 'picked_up', label: 'Mark as Picked Up 📦' },
-    packed: { next: 'picked_up', label: 'Mark as Picked Up 📦' },
-    picked_up: { next: 'on_the_way', label: 'Mark On the Way 🚀' },
-    on_the_way: { next: 'delivered', label: 'Mark as Delivered ✅' },
+    confirmed: { next: 'picked_up', label: 'Mark as Picked Up' },
+    packed: { next: 'picked_up', label: 'Mark as Picked Up' },
+    picked_up: { next: 'on_the_way', label: 'Mark On the Way' },
+    on_the_way: { next: 'delivered', label: 'Mark as Delivered' },
 } as const;
 
 export default function DeliveryOrdersScreen() {
@@ -71,13 +72,22 @@ export default function DeliveryOrdersScreen() {
                     </View>
                 </View>
                 <View style={styles.addressRow}>
-                    <Text style={styles.addressIcon}>📍</Text>
+                    <MaterialCommunityIcons name="map-marker-outline" size={16} color={Colors.text.secondary} />
                     <Text style={styles.addressText}>{order.deliveryAddress.fullAddress}</Text>
                 </View>
                 <View style={styles.orderMeta}>
-                    <Text style={styles.metaText}>💰 ₹{order.total}</Text>
-                    <Text style={styles.metaText}>📦 {order.items.length} items</Text>
-                    <Text style={styles.metaText}>💳 {order.paymentMethod.toUpperCase()}</Text>
+                    <View style={styles.metaItem}>
+                        <MaterialCommunityIcons name="currency-inr" size={14} color={Colors.text.secondary} />
+                        <Text style={styles.metaText}>{order.total}</Text>
+                    </View>
+                    <View style={styles.metaItem}>
+                        <MaterialCommunityIcons name="package-variant" size={14} color={Colors.text.secondary} />
+                        <Text style={styles.metaText}>{order.items.length} items</Text>
+                    </View>
+                    <View style={styles.metaItem}>
+                        <MaterialCommunityIcons name="credit-card-outline" size={14} color={Colors.text.secondary} />
+                        <Text style={styles.metaText}>{order.paymentMethod.toUpperCase()}</Text>
+                    </View>
                 </View>
                 {order.status === 'on_the_way' && (
                     <View style={styles.otpRow}>
@@ -112,7 +122,7 @@ export default function DeliveryOrdersScreen() {
                 <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 60 }} />
             ) : orders.length === 0 ? (
                 <View style={styles.emptyState}>
-                    <Text style={styles.emptyEmoji}>📭</Text>
+                    <MaterialCommunityIcons name="inbox-outline" size={80} color="#BDBDBD" style={{ marginBottom: Spacing.base }} />
                     <Text style={styles.emptyTitle}>No active orders</Text>
                     <Text style={styles.emptySubtitle}>Go online to start receiving orders</Text>
                 </View>
@@ -146,9 +156,9 @@ const styles = StyleSheet.create({
     statusBadge: { backgroundColor: Colors.primaryLight, borderRadius: BorderRadius.full, paddingHorizontal: Spacing.sm, paddingVertical: 2 },
     statusText: { fontSize: 9, fontFamily: 'Poppins-Bold', color: Colors.primary },
     addressRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.sm, alignItems: 'flex-start' },
-    addressIcon: { fontSize: 16 },
     addressText: { flex: 1, fontSize: Typography.fontSize.sm, color: Colors.text.secondary, lineHeight: 20 },
     orderMeta: { flexDirection: 'row', gap: Spacing.base, marginBottom: Spacing.base },
+    metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
     metaText: { fontSize: Typography.fontSize.sm, color: Colors.text.secondary, fontFamily: 'Poppins-Medium' },
     otpRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.secondaryLight, borderRadius: BorderRadius.md, padding: Spacing.sm, marginBottom: Spacing.base },
     otpLabel: { fontSize: Typography.fontSize.sm, color: Colors.text.secondary },
@@ -156,7 +166,6 @@ const styles = StyleSheet.create({
     actionBtn: { backgroundColor: Colors.primary, borderRadius: BorderRadius.lg, paddingVertical: Spacing.base, alignItems: 'center', ...Shadows.primary },
     actionBtnText: { fontSize: Typography.fontSize.base, fontFamily: 'Poppins-SemiBold', color: '#fff' },
     emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing['2xl'] },
-    emptyEmoji: { fontSize: 64, marginBottom: Spacing.base },
     emptyTitle: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: Colors.text.primary, marginBottom: Spacing.sm },
     emptySubtitle: { fontSize: Typography.fontSize.base, color: Colors.text.secondary, textAlign: 'center' },
 });

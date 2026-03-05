@@ -14,14 +14,17 @@ import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import { subscribeToOrder } from '@/services/orders.service';
 import type { Order, OrderStatus } from '@/types';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
-const STATUS_STEPS: { status: OrderStatus; label: string; emoji: string }[] = [
-    { status: 'pending', label: 'Order Placed', emoji: '📋' },
-    { status: 'confirmed', label: 'Confirmed', emoji: '✅' },
-    { status: 'packed', label: 'Packed', emoji: '📦' },
-    { status: 'picked_up', label: 'Picked Up', emoji: '🛵' },
-    { status: 'on_the_way', label: 'On the Way', emoji: '🚀' },
-    { status: 'delivered', label: 'Delivered', emoji: '🎉' },
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+const STATUS_STEPS: { status: OrderStatus; label: string; icon: IconName }[] = [
+    { status: 'pending', label: 'Order Placed', icon: 'clipboard-text-outline' },
+    { status: 'confirmed', label: 'Confirmed', icon: 'check-circle-outline' },
+    { status: 'packed', label: 'Packed', icon: 'package-variant' },
+    { status: 'picked_up', label: 'Picked Up', icon: 'moped' },
+    { status: 'on_the_way', label: 'On the Way', icon: 'map-marker-path' },
+    { status: 'delivered', label: 'Delivered', icon: 'home-clock-outline' },
 ];
 
 export default function OrderTrackingScreen() {
@@ -51,7 +54,7 @@ export default function OrderTrackingScreen() {
             {/* Header */}
             <LinearGradient colors={['#0C831F', '#34A853']} style={styles.header}>
                 <TouchableOpacity onPress={() => router.replace('/(user)/orders')}>
-                    <Text style={styles.backText}>←</Text>
+                    <MaterialIcons name="arrow-back" size={24} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Order #{id?.slice(-6).toUpperCase()}</Text>
                 <View style={{ width: 30 }} />
@@ -60,14 +63,18 @@ export default function OrderTrackingScreen() {
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Status Hero */}
                 <View style={styles.statusHero}>
-                    <Text style={styles.statusEmoji}>
-                        {STATUS_STEPS.find(s => s.status === order.status)?.emoji ?? '📦'}
-                    </Text>
+                    <View style={styles.statusIconCircle}>
+                        <MaterialCommunityIcons
+                            name={STATUS_STEPS.find(s => s.status === order.status)?.icon ?? 'package-variant'}
+                            size={48}
+                            color={isCancelled ? Colors.error : Colors.primary}
+                        />
+                    </View>
                     <Text style={styles.statusTitle}>
                         {order.status === 'delivered'
-                            ? '🎉 Delivered!'
+                            ? 'Delivered!'
                             : isCancelled
-                                ? '❌ Order Cancelled'
+                                ? 'Order Cancelled'
                                 : `${STATUS_STEPS.find(s => s.status === order.status)?.label ?? 'Processing'}...`}
                     </Text>
                     {order.estimatedDelivery && (
@@ -102,9 +109,10 @@ export default function OrderTrackingScreen() {
                                                 isCurrent && styles.timelineDotCurrent,
                                             ]}
                                         >
-                                            <Text style={styles.timelineDotText}>
-                                                {isCompleted ? '✓' : step.emoji}
-                                            </Text>
+                                            {isCompleted
+                                                ? <MaterialCommunityIcons name="check" size={16} color="#fff" />
+                                                : <MaterialCommunityIcons name={step.icon} size={16} color={isCurrent ? Colors.primary : '#BDBDBD'} />
+                                            }
                                         </View>
                                         {index < STATUS_STEPS.length - 1 && (
                                             <View
@@ -156,20 +164,24 @@ export default function OrderTrackingScreen() {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Delivery Details</Text>
                     <View style={styles.detailRow}>
-                        <Text style={styles.detailKey}>📍 Address</Text>
+                        <MaterialCommunityIcons name="map-marker-outline" size={18} color={Colors.text.secondary} />
+                        <Text style={styles.detailKey}>Address</Text>
                         <Text style={styles.detailVal}>{order.deliveryAddress.fullAddress}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                        <Text style={styles.detailKey}>💳 Payment</Text>
+                        <MaterialCommunityIcons name="credit-card-outline" size={18} color={Colors.text.secondary} />
+                        <Text style={styles.detailKey}>Payment</Text>
                         <Text style={styles.detailVal}>{order.paymentMethod.toUpperCase()}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                        <Text style={styles.detailKey}>💰 Total</Text>
+                        <MaterialCommunityIcons name="currency-inr" size={18} color={Colors.text.secondary} />
+                        <Text style={styles.detailKey}>Total</Text>
                         <Text style={[styles.detailVal, { fontFamily: 'Poppins-Bold' }]}>₹{order.total}</Text>
                     </View>
                     {order.deliveryPartnerName && (
                         <View style={styles.detailRow}>
-                            <Text style={styles.detailKey}>🛵 Partner</Text>
+                            <MaterialCommunityIcons name="moped" size={18} color={Colors.text.secondary} />
+                            <Text style={styles.detailKey}>Partner</Text>
                             <Text style={styles.detailVal}>{order.deliveryPartnerName}</Text>
                         </View>
                     )}
@@ -200,7 +212,15 @@ const styles = StyleSheet.create({
         padding: Spacing['3xl'],
         ...Shadows.sm,
     },
-    statusEmoji: { fontSize: 64, marginBottom: Spacing.base },
+    statusIconCircle: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: Colors.primaryLight,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: Spacing.base,
+    },
     statusTitle: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: Colors.text.primary, marginBottom: 4 },
     etaText: { fontSize: Typography.fontSize.base, color: Colors.text.secondary, fontFamily: 'Poppins-Regular' },
     otpCard: {

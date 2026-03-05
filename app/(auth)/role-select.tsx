@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 import { auth } from '@/lib/firebase';
 import { updateUserRole } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/authStore';
@@ -19,14 +20,14 @@ import type { UserRole } from '@/types';
 const roles = [
     {
         role: 'user' as UserRole,
-        emoji: '🛒',
+        icon: 'shopping-cart' as const,
         title: 'Customer',
         description: 'Browse products, place orders, and get groceries delivered to your doorstep',
         gradient: ['#0C831F', '#34A853'] as const,
     },
     {
         role: 'delivery' as UserRole,
-        emoji: '🛵',
+        icon: 'directions-bike' as const,
         title: 'Delivery Partner',
         description: 'Earn money by delivering orders to customers in your neighbourhood',
         gradient: ['#1565C0', '#42A5F5'] as const,
@@ -69,7 +70,12 @@ export default function RoleSelectScreen() {
                                 colors={selected === item.role ? item.gradient : (['#fff', '#fff'] as any)}
                                 style={[styles.card, selected === item.role && styles.selectedCard]}
                             >
-                                <Text style={styles.cardEmoji}>{item.emoji}</Text>
+                                <MaterialIcons
+                                    name={item.icon}
+                                    size={48}
+                                    color={selected === item.role ? '#fff' : Colors.primary}
+                                    style={{ marginBottom: Spacing.md }}
+                                />
                                 <Text
                                     style={[styles.cardTitle, selected === item.role && styles.cardTitleSelected]}
                                 >
@@ -105,9 +111,12 @@ export default function RoleSelectScreen() {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                     >
-                        <Text style={styles.continueText}>
-                            {loading ? 'Setting up...' : 'Continue →'}
-                        </Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={styles.continueText}>
+                                {loading ? 'Setting up...' : 'Continue'}
+                            </Text>
+                            {!loading && <MaterialIcons name="arrow-forward" size={18} color="#fff" />}
+                        </View>
                     </LinearGradient>
                 </TouchableOpacity>
             </ScrollView>

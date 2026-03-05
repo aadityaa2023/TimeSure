@@ -1,108 +1,139 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
-    TextInput,
-    KeyboardAvoidingView,
-    Platform,
     ScrollView,
-    Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useAuthStore } from '@/stores/authStore';
+import { UserRole } from '@/types';
+import { auth, db } from '@/lib/firebase';
+import { signInAnonymously } from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { ActivityIndicator } from 'react-native';
+
+const ROLES: { label: string; role: UserRole; icon: keyof typeof MaterialIcons.glyphMap; desc: string; colors: [string, string] }[] = [
+    {
+        label: 'Customer',
+        role: 'user',
+        icon: 'shopping-cart',
+        desc: 'Browse products & place orders',
+        colors: ['#0C831F', '#34A853'],
+    },
+    {
+        label: 'Admin',
+        role: 'admin',
+        icon: 'admin-panel-settings',
+        desc: 'Manage orders, products & users',
+        colors: ['#1565C0', '#42A5F5'],
+    },
+    {
+        label: 'Delivery Partner',
+        role: 'delivery',
+        icon: 'directions-bike',
+        desc: 'View & deliver assigned orders',
+        colors: ['#6A1B9A', '#AB47BC'],
+    },
+];
+
+const ROUTE_MAP: Record<UserRole, string> = {
+    user: '/(user)',
+    admin: '/(admin)',
+    delivery: '/(delivery)',
+};
 
 export default function LoginScreen() {
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [loading, setLoading] = useState(false);
-    const inputRef = useRef<TextInput>(null);
+    const { setUser } = useAuthStore();
+    const [isAuthenticating, setIsAuthenticating] = React.useState<string | null>(null);
 
-    const handleSendOTP = async () => {
-        const cleaned = phoneNumber.replace(/\D/g, '');
-        if (cleaned.length !== 10) {
-            Alert.alert('Invalid Number', 'Please enter a valid 10-digit mobile number.');
-            return;
-        }
-        setLoading(true);
+    const handleRoleSelect = async (role: UserRole) => {
+        setIsAuthenticating(role);
         try {
-            // reCAPTCHA and OTP sending is handled in the OTP screen
-            // Pass phone to OTP screen via params
-            router.push({ pathname: '/(auth)/otp', params: { phone: `+91${cleaned}` } });
-        } catch (e) {
-            Alert.alert('Error', 'Failed to send OTP. Please try again.');
+            // 1. Sign in anonymously to satisfy Firestore 'isAuthenticated()' rules
+            const { user: firebaseUser } = await signInAnonymously(auth);
+
+            // 2. Create/Update user document in Firestore to satisfy 'getUserRole()' rules
+            const userRef = doc(db, 'users', firebaseUser.uid);
+            const userData = {
+                uid: firebaseUser.uid,
+                id: firebaseUser.uid,
+                name: role === 'admin' ? 'Admin Dev' : role === 'delivery' ? 'Delivery Dev' : 'Customer Dev',
+                phone: '+910000000000',
+                role,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+
+            await setDoc(userRef, userData, { merge: true });
+
+            // 3. Update local store
+            setUser(userData as any);
+
+            router.replace(ROUTE_MAP[role] as any);
+        } catch (error: any) {
+            console.error('Bypass Auth Error:', error);
+            alert(`Failed to authenticate: ${error.message}\n\nPlease ensure 'Anonymous Sign-in' is enabled in your Firebase Console.`);
         } finally {
-            setLoading(false);
+            setIsAuthenticating(null);
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
-            >
-                <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <LinearGradient colors={['#0C831F', '#34A853']} style={styles.logoCircle}>
-                            <Text style={styles.logoEmoji}>⚡</Text>
-                        </LinearGradient>
-                        <Text style={styles.appName}>TimeSure</Text>
-                        <Text style={styles.tagline}>Delivery in 10 minutes</Text>
+            <ScrollView contentContainerStyle={styles.scroll}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <LinearGradient colors={['#0C831F', '#34A853']} style={styles.logoCircle}>
+                        <MaterialIcons name="flash-on" size={48} color="#fff" />
+                    </LinearGradient>
+                    <Text style={styles.appName}>TimeSure</Text>
+                    <Text style={styles.tagline}>Delivery in 10 minutes</Text>
+                </View>
+
+                {/* Dev login notice */}
+                <View style={styles.devBadge}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <MaterialIcons name="build" size={16} color="#F57F17" />
+                        <Text style={styles.devText}>Dev Mode — No credentials required</Text>
                     </View>
+                </View>
 
-                    {/* Form */}
-                    <View style={styles.card}>
-                        <Text style={styles.welcomeText}>Welcome!</Text>
-                        <Text style={styles.subText}>Enter your mobile number to get started</Text>
-
-                        <View style={styles.phoneRow}>
-                            <View style={styles.countryCode}>
-                                <Text style={styles.countryCodeText}>🇮🇳 +91</Text>
-                            </View>
-                            <TextInput
-                                ref={inputRef}
-                                style={styles.phoneInput}
-                                placeholder="Mobile number"
-                                placeholderTextColor={Colors.text.disabled}
-                                keyboardType="phone-pad"
-                                maxLength={10}
-                                value={phoneNumber}
-                                onChangeText={setPhoneNumber}
-                                autoFocus
-                            />
-                        </View>
-
-                        <TouchableOpacity
-                            style={[styles.sendBtn, loading && { opacity: 0.7 }]}
-                            onPress={handleSendOTP}
-                            disabled={loading}
-                            activeOpacity={0.85}
+                {/* Role cards */}
+                <Text style={styles.pickLabel}>Continue as</Text>
+                {ROLES.map(item => (
+                    <TouchableOpacity
+                        key={item.role}
+                        style={styles.card}
+                        onPress={() => handleRoleSelect(item.role)}
+                        activeOpacity={0.85}
+                    >
+                        <LinearGradient
+                            colors={item.colors}
+                            style={styles.cardGradient}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
                         >
-                            <LinearGradient
-                                colors={['#0C831F', '#34A853']}
-                                style={styles.sendGradient}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                            >
-                                <Text style={styles.sendText}>
-                                    {loading ? 'Sending OTP...' : 'Send OTP →'}
-                                </Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-
-                        <Text style={styles.termsText}>
-                            By continuing, you agree to our{' '}
-                            <Text style={styles.link}>Terms of Service</Text> and{' '}
-                            <Text style={styles.link}>Privacy Policy</Text>
-                        </Text>
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
+                            <MaterialIcons name={item.icon} size={36} color="#fff" />
+                            <View style={styles.cardText}>
+                                <Text style={styles.cardLabel}>{item.label}</Text>
+                                <Text style={styles.cardDesc}>{item.desc}</Text>
+                            </View>
+                            {isAuthenticating === item.role ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <MaterialIcons name="arrow-forward" size={24} color="#fff" />
+                            )}
+                        </LinearGradient>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -115,7 +146,7 @@ const styles = StyleSheet.create({
         paddingTop: Spacing['4xl'],
         paddingBottom: Spacing['2xl'],
     },
-    header: { alignItems: 'center', marginBottom: Spacing['3xl'] },
+    header: { alignItems: 'center', marginBottom: Spacing['2xl'] },
     logoCircle: {
         width: 80,
         height: 80,
@@ -137,75 +168,56 @@ const styles = StyleSheet.create({
         fontFamily: Typography.fontFamily.regular,
         color: Colors.text.secondary,
     },
-    card: {
-        backgroundColor: Colors.surface,
-        borderRadius: BorderRadius['2xl'],
-        padding: Spacing['2xl'],
-        ...Shadows.lg,
-    },
-    welcomeText: {
-        fontSize: Typography.fontSize['2xl'],
-        fontFamily: Typography.fontFamily.bold,
-        color: Colors.text.primary,
-        marginBottom: Spacing.xs,
-    },
-    subText: {
-        fontSize: Typography.fontSize.base,
-        fontFamily: Typography.fontFamily.regular,
-        color: Colors.text.secondary,
-        marginBottom: Spacing['2xl'],
-    },
-    phoneRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1.5,
-        borderColor: Colors.border,
+    devBadge: {
+        backgroundColor: '#FFF8E1',
         borderRadius: BorderRadius.lg,
+        paddingVertical: Spacing.sm,
+        paddingHorizontal: Spacing.base,
         marginBottom: Spacing['2xl'],
-        overflow: 'hidden',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#FFD54F',
     },
-    countryCode: {
-        paddingHorizontal: Spacing.base,
-        paddingVertical: Spacing.base,
-        backgroundColor: Colors.primaryLight,
-        borderRightWidth: 1.5,
-        borderRightColor: Colors.border,
-    },
-    countryCodeText: {
-        fontSize: Typography.fontSize.base,
+    devText: {
+        fontSize: Typography.fontSize.sm,
         fontFamily: Typography.fontFamily.medium,
-        color: Colors.text.primary,
+        color: '#F57F17',
     },
-    phoneInput: {
-        flex: 1,
-        paddingHorizontal: Spacing.base,
-        paddingVertical: Spacing.base,
-        fontSize: Typography.fontSize.md,
-        fontFamily: Typography.fontFamily.medium,
+    pickLabel: {
+        fontSize: Typography.fontSize.lg,
+        fontFamily: Typography.fontFamily.semiBold,
         color: Colors.text.primary,
-        letterSpacing: 1.5,
+        marginBottom: Spacing.base,
     },
-    sendBtn: {
-        width: '100%',
-        borderRadius: BorderRadius.xl,
+    card: {
+        borderRadius: BorderRadius['2xl'],
         overflow: 'hidden',
         marginBottom: Spacing.base,
-        ...Shadows.primary,
+        ...Shadows.lg,
     },
-    sendGradient: {
-        paddingVertical: Spacing.base,
+    cardGradient: {
+        flexDirection: 'row',
         alignItems: 'center',
+        paddingVertical: Spacing.lg,
+        paddingHorizontal: Spacing['2xl'],
+        gap: Spacing.base,
     },
-    sendText: {
+    cardEmoji: { fontSize: 32 },
+    cardText: { flex: 1 },
+    cardLabel: {
         fontSize: Typography.fontSize.md,
         fontFamily: Typography.fontFamily.semiBold,
         color: '#fff',
     },
-    termsText: {
+    cardDesc: {
         fontSize: Typography.fontSize.sm,
-        color: Colors.text.secondary,
-        textAlign: 'center',
-        lineHeight: 20,
+        fontFamily: Typography.fontFamily.regular,
+        color: 'rgba(255,255,255,0.8)',
+        marginTop: 2,
     },
-    link: { color: Colors.primary, fontFamily: Typography.fontFamily.medium },
+    cardArrow: {
+        fontSize: Typography.fontSize.xl,
+        color: '#fff',
+        fontFamily: Typography.fontFamily.bold,
+    },
 });

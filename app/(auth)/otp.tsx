@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
     Alert,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -115,7 +116,10 @@ export default function OTPScreen() {
             >
                 <View style={styles.content}>
                     <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                        <Text style={styles.backText}>← Back</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <MaterialIcons name="arrow-back" size={20} color={Colors.primary} />
+                            <Text style={styles.backText}>Back</Text>
+                        </View>
                     </TouchableOpacity>
 
                     <View style={styles.header}>

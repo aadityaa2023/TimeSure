@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery } from '@tanstack/react-query';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 import { getProductById } from '@/services/products.service';
 import { useCartStore } from '@/stores/cartStore';
 
@@ -50,7 +51,7 @@ export default function ProductDetailScreen() {
                 {/* Header */}
                 <View style={styles.imageSection}>
                     <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-                        <Text style={styles.backIcon}>←</Text>
+                        <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
                     </TouchableOpacity>
                     <View style={styles.imageBg}>
                         <Image
@@ -87,13 +88,22 @@ export default function ProductDetailScreen() {
 
                     {/* Stock */}
                     <View style={[styles.stockBadge, { backgroundColor: product.stock > 10 ? Colors.primaryLight : '#FFF3E0' }]}>
-                        <Text style={[styles.stockText, { color: product.stock > 10 ? Colors.primary : Colors.warning }]}>
-                            {product.stock === 0
-                                ? '❌ Out of Stock'
-                                : product.stock <= 10
-                                    ? `⚠️ Only ${product.stock} left`
-                                    : '✅ In Stock'}
-                        </Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            {product.stock === 0 ? (
+                                <MaterialIcons name="cancel" size={16} color="red" />
+                            ) : product.stock <= 10 ? (
+                                <MaterialIcons name="warning" size={16} color="orange" />
+                            ) : (
+                                <MaterialIcons name="check-circle" size={16} color="green" />
+                            )}
+                            <Text style={[styles.stockText, { color: product.stock > 10 ? Colors.primary : Colors.warning, marginLeft: 6 }]}>
+                                {product.stock === 0
+                                    ? 'Out of Stock'
+                                    : product.stock <= 10
+                                        ? `Only ${product.stock} left`
+                                        : 'In Stock'}
+                            </Text>
+                        </View>
                     </View>
 
                     {/* Description */}
@@ -136,14 +146,14 @@ export default function ProductDetailScreen() {
                             style={styles.qtyBtn}
                             onPress={() => updateQty(product.id, cartItem.quantity - 1)}
                         >
-                            <Text style={styles.qtyBtnText}>−</Text>
+                            <MaterialIcons name="remove" size={24} color="#fff" />
                         </TouchableOpacity>
                         <Text style={styles.qtyCount}>{cartItem.quantity}</Text>
                         <TouchableOpacity
                             style={styles.qtyBtn}
                             onPress={() => updateQty(product.id, cartItem.quantity + 1)}
                         >
-                            <Text style={styles.qtyBtnText}>+</Text>
+                            <MaterialIcons name="add" size={24} color="#fff" />
                         </TouchableOpacity>
                     </View>
                 ) : (
@@ -159,9 +169,16 @@ export default function ProductDetailScreen() {
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
                         >
-                            <Text style={styles.addBtnText}>
-                                {product.stock === 0 ? 'Out of Stock' : '🛒 Add to Cart'}
-                            </Text>
+                            <View style={styles.addBtnContent}>
+                                {product.stock === 0 ? (
+                                    <Text style={styles.addBtnText}>Out of Stock</Text>
+                                ) : (
+                                    <>
+                                        <MaterialIcons name="shopping-cart" size={20} color="#fff" />
+                                        <Text style={[styles.addBtnText, { marginLeft: 8 }]}>Add to Cart</Text>
+                                    </>
+                                )}
+                            </View>
                         </LinearGradient>
                     </TouchableOpacity>
                 )}
@@ -297,6 +314,7 @@ const styles = StyleSheet.create({
     bottomPriceVal: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: Colors.text.primary },
     addBtn: { flex: 2, borderRadius: BorderRadius.xl, overflow: 'hidden', ...Shadows.primary },
     addGradient: { paddingVertical: Spacing.base, alignItems: 'center' },
+    addBtnContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
     addBtnText: { fontSize: Typography.fontSize.base, fontFamily: 'Poppins-SemiBold', color: '#fff' },
     qtyRow: {
         flex: 2,

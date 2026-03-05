@@ -16,15 +16,19 @@ import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typograp
 import { useAuthStore } from '@/stores/authStore';
 import { signOutUser } from '@/services/auth.service';
 
-const menuItems = [
-    { emoji: '📍', label: 'Manage Addresses', route: '/(user)/addresses' },
-    { emoji: '💳', label: 'Payment Methods', route: null },
-    { emoji: '👛', label: 'TimeSure Wallet', route: '/(user)/wallet' },
-    { emoji: '🏷️', label: 'My Coupons', route: null },
-    { emoji: '🔔', label: 'Notifications', route: null },
-    { emoji: '⭐', label: 'Rate the App', route: null },
-    { emoji: '💬', label: 'Help & Support', route: null },
-    { emoji: '📜', label: 'Terms & Privacy', route: null },
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+const menuItems: { icon: IconName; iconBg: string; label: string; route: string | null }[] = [
+    { icon: 'map-marker-outline', iconBg: '#E3F2FD', label: 'Manage Addresses', route: '/(user)/addresses' },
+    { icon: 'credit-card-outline', iconBg: '#FCE4EC', label: 'Payment Methods', route: null },
+    { icon: 'wallet-outline', iconBg: '#E8F5E9', label: 'TimeSure Wallet', route: '/(user)/wallet' },
+    { icon: 'ticket-percent-outline', iconBg: '#FFF8E1', label: 'My Coupons', route: null },
+    { icon: 'bell-outline', iconBg: '#EDE7F6', label: 'Notifications', route: null },
+    { icon: 'star-outline', iconBg: '#FFF9C4', label: 'Rate the App', route: null },
+    { icon: 'message-question-outline', iconBg: '#E3F2FD', label: 'Help & Support', route: null },
+    { icon: 'file-document-outline', iconBg: '#F3E5F5', label: 'Terms & Privacy', route: null },
 ];
 
 export default function ProfileScreen() {
@@ -66,7 +70,8 @@ export default function ProfileScreen() {
                     <Text style={styles.userName}>{user?.name ?? 'User'}</Text>
                     <Text style={styles.userPhone}>{user?.phone}</Text>
                     <TouchableOpacity style={styles.editBtn}>
-                        <Text style={styles.editBtnText}>✏️ Edit Profile</Text>
+                        <MaterialCommunityIcons name="pencil-outline" size={14} color="#fff" />
+                        <Text style={styles.editBtnText}>Edit Profile</Text>
                     </TouchableOpacity>
                 </LinearGradient>
 
@@ -83,7 +88,10 @@ export default function ProfileScreen() {
                     </View>
                     <View style={styles.statDivider} />
                     <View style={styles.statCard}>
-                        <Text style={styles.statNum}>⭐ 4.9</Text>
+                        <View style={styles.ratingRow}>
+                            <MaterialCommunityIcons name="star" size={16} color="#F59E0B" />
+                            <Text style={styles.statNum}> 4.9</Text>
+                        </View>
                         <Text style={styles.statLabel}>Rating</Text>
                     </View>
                 </View>
@@ -97,16 +105,19 @@ export default function ProfileScreen() {
                             onPress={() => item.route && router.push(item.route as any)}
                             activeOpacity={0.7}
                         >
-                            <Text style={styles.menuEmoji}>{item.emoji}</Text>
+                            <View style={[styles.menuIconCircle, { backgroundColor: item.iconBg }]}>
+                                <MaterialCommunityIcons name={item.icon} size={18} color="#555" />
+                            </View>
                             <Text style={styles.menuLabel}>{item.label}</Text>
-                            <Text style={styles.menuChevron}>›</Text>
+                            <MaterialCommunityIcons name="chevron-right" size={20} color="#BDBDBD" />
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 {/* Logout */}
                 <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
-                    <Text style={styles.logoutText}>🚪 Logout</Text>
+                    <MaterialCommunityIcons name="logout" size={18} color={Colors.error} style={{ marginRight: 8 }} />
+                    <Text style={styles.logoutText}>Logout</Text>
                 </TouchableOpacity>
 
                 <Text style={styles.version}>TimeSure v1.0.0</Text>
@@ -138,6 +149,9 @@ const styles = StyleSheet.create({
     userName: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: '#fff', marginBottom: 4 },
     userPhone: { fontSize: Typography.fontSize.base, color: 'rgba(255,255,255,0.85)', marginBottom: Spacing.base },
     editBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderRadius: BorderRadius.full,
         paddingHorizontal: Spacing.base,
@@ -155,6 +169,7 @@ const styles = StyleSheet.create({
     },
     statCard: { flex: 1, alignItems: 'center', paddingVertical: Spacing.sm },
     statNum: { fontSize: Typography.fontSize.lg, fontFamily: 'Poppins-Bold', color: Colors.text.primary },
+    ratingRow: { flexDirection: 'row', alignItems: 'center' },
     statLabel: { fontSize: Typography.fontSize.xs, color: Colors.text.secondary, marginTop: 2 },
     statDivider: { width: 1, backgroundColor: Colors.border, marginVertical: Spacing.xs },
     menuSection: {
@@ -167,16 +182,23 @@ const styles = StyleSheet.create({
     },
     menuItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.base, paddingVertical: Spacing.base + 4, gap: Spacing.base },
     menuItemBorder: { borderBottomWidth: 1, borderBottomColor: Colors.divider },
-    menuEmoji: { fontSize: 20, width: 28 },
+    menuIconCircle: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     menuLabel: { flex: 1, fontSize: Typography.fontSize.base, fontFamily: 'Poppins-Medium', color: Colors.text.primary },
-    menuChevron: { fontSize: 22, color: Colors.text.disabled },
     logoutBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         margin: Spacing.base,
         marginTop: Spacing.sm,
         backgroundColor: Colors.surface,
         borderRadius: BorderRadius.xl,
         padding: Spacing.base + 4,
-        alignItems: 'center',
         borderWidth: 1.5,
         borderColor: Colors.error,
     },

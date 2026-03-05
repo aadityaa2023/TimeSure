@@ -20,6 +20,7 @@ import { getProductById } from '@/services/products.service';
 import { uploadProductImage } from '@/services/storage.service';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function AdminProductEditScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -92,7 +93,7 @@ export default function AdminProductEditScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backText}>←</Text>
+                    <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{isNew ? 'Add Product' : 'Edit Product'}</Text>
                 <View style={{ width: 30 }} />
@@ -103,7 +104,7 @@ export default function AdminProductEditScreen() {
                         <Image source={{ uri: imageUri }} style={styles.image} contentFit="contain" />
                     ) : (
                         <View style={styles.imagePlaceholder}>
-                            <Text style={styles.imageIcon}>📷</Text>
+                            <MaterialIcons name="add-a-photo" size={40} color={Colors.text.disabled} />
                             <Text style={styles.imageLabel}>Tap to add image</Text>
                         </View>
                     )}

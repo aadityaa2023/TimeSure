@@ -6,6 +6,7 @@ import { signOutUser } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/authStore';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function DeliveryProfileScreen() {
     const { user, logout } = useAuthStore();
@@ -23,7 +24,10 @@ export default function DeliveryProfileScreen() {
                     style={styles.logoutBtn}
                     onPress={async () => { await signOutUser(); logout(); router.replace('/(auth)'); }}
                 >
-                    <Text style={styles.logoutText}>🚪 Logout</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <MaterialIcons name="logout" size={20} color={Colors.error} />
+                        <Text style={styles.logoutText}>Logout</Text>
+                    </View>
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>

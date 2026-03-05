@@ -17,22 +17,27 @@ import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import { useAuthStore } from '@/stores/authStore';
 import { signOutUser } from '@/services/auth.service';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
-const adminMenuItems = [
-    { emoji: '📦', label: 'Products', route: '/(admin)/products/index', gradient: ['#0C831F', '#34A853'] as const },
-    { emoji: '🗂️', label: 'Categories', route: '/(admin)/categories/index', gradient: ['#1565C0', '#42A5F5'] as const },
-    { emoji: '📋', label: 'Orders', route: '/(admin)/orders/index', gradient: ['#7B1FA2', '#AB47BC'] as const },
-    { emoji: '🛵', label: 'Delivery Partners', route: null, gradient: ['#E65100', '#FF7043'] as const },
-    { emoji: '👥', label: 'Users', route: '/(admin)/users', gradient: ['#00695C', '#26A69A'] as const },
-    { emoji: '🏷️', label: 'Coupons', route: '/(admin)/coupons/index', gradient: ['#AD1457', '#F06292'] as const },
-    { emoji: '📊', label: 'Analytics', route: '/(admin)/analytics', gradient: ['#1A237E', '#3F51B5'] as const },
-    { emoji: '🔔', label: 'Notifications', route: null, gradient: ['#BF360C', '#FF7043'] as const },
+type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+
+const adminMenuItems: { icon: IconName; label: string; route: string | null; gradient: readonly [string, string] }[] = [
+    { icon: 'package-variant-closed', label: 'Products', route: '/(admin)/products/index', gradient: ['#0C831F', '#34A853'] },
+    { icon: 'shape', label: 'Categories', route: '/(admin)/categories/index', gradient: ['#1565C0', '#42A5F5'] },
+    { icon: 'clipboard-list', label: 'Orders', route: '/(admin)/orders/index', gradient: ['#7B1FA2', '#AB47BC'] },
+    { icon: 'moped', label: 'Delivery Partners', route: null, gradient: ['#E65100', '#FF7043'] },
+    { icon: 'account-group', label: 'Users', route: '/(admin)/users', gradient: ['#00695C', '#26A69A'] },
+    { icon: 'ticket-percent', label: 'Coupons', route: '/(admin)/coupons/index', gradient: ['#AD1457', '#F06292'] },
+    { icon: 'chart-bar', label: 'Analytics', route: '/(admin)/analytics', gradient: ['#1A237E', '#3F51B5'] },
+    { icon: 'bell-ring', label: 'Notifications', route: null, gradient: ['#BF360C', '#FF7043'] },
 ];
 
-function KPICard({ label, value, emoji, gradient }: { label: string; value: string; emoji: string; gradient: readonly [string, string] }) {
+function KPICard({ label, value, icon, gradient }: { label: string; value: string; icon: IconName; gradient: readonly [string, string] }) {
     return (
         <LinearGradient colors={gradient} style={styles.kpiCard}>
-            <Text style={styles.kpiEmoji}>{emoji}</Text>
+            <View style={styles.kpiIconCircle}>
+                <MaterialCommunityIcons name={icon} size={22} color="#fff" />
+            </View>
             <Text style={styles.kpiValue}>{value}</Text>
             <Text style={styles.kpiLabel}>{label}</Text>
         </LinearGradient>
@@ -78,7 +83,10 @@ export default function AdminDashboard() {
             <LinearGradient colors={['#1A237E', '#283593']} style={styles.header}>
                 <View>
                     <Text style={styles.headerTitle}>Admin Panel</Text>
-                    <Text style={styles.headerSubtitle}>⚡ TimeSure Control Center</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <MaterialIcons name="flash-on" size={14} color="rgba(255,255,255,0.7)" />
+                        <Text style={styles.headerSubtitle}>TimeSure Control Center</Text>
+                    </View>
                 </View>
                 <TouchableOpacity onPress={handleLogout}>
                     <Text style={styles.logoutText}>Logout</Text>
@@ -87,16 +95,16 @@ export default function AdminDashboard() {
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
                 {/* KPI Cards */}
-                <Text style={styles.sectionTitle}>📊 Overview</Text>
+                <Text style={styles.sectionTitle}>Overview</Text>
                 <View style={styles.kpiGrid}>
-                    <KPICard emoji="📋" label="Total Orders" value={kpis.orders.toString()} gradient={['#0C831F', '#34A853']} />
-                    <KPICard emoji="💰" label="Revenue" value={`₹${kpis.revenue.toLocaleString('en-IN')}`} gradient={['#1565C0', '#42A5F5']} />
-                    <KPICard emoji="👥" label="Users" value={kpis.users.toString()} gradient={['#7B1FA2', '#AB47BC']} />
-                    <KPICard emoji="📦" label="Products" value={kpis.products.toString()} gradient={['#E65100', '#FF7043']} />
+                    <KPICard icon="clipboard-list-outline" label="Total Orders" value={kpis.orders.toString()} gradient={['#0C831F', '#34A853']} />
+                    <KPICard icon="currency-inr" label="Revenue" value={`₹${kpis.revenue.toLocaleString('en-IN')}`} gradient={['#1565C0', '#42A5F5']} />
+                    <KPICard icon="account-group" label="Users" value={kpis.users.toString()} gradient={['#7B1FA2', '#AB47BC']} />
+                    <KPICard icon="package-variant-closed" label="Products" value={kpis.products.toString()} gradient={['#E65100', '#FF7043']} />
                 </View>
 
                 {/* Quick Access Menu */}
-                <Text style={styles.sectionTitle}>🚀 Quick Access</Text>
+                <Text style={styles.sectionTitle}>Quick Access</Text>
                 <View style={styles.menuGrid}>
                     {adminMenuItems.map((item, i) => (
                         <TouchableOpacity
@@ -106,7 +114,7 @@ export default function AdminDashboard() {
                             activeOpacity={0.85}
                         >
                             <LinearGradient colors={item.gradient} style={styles.menuGradient}>
-                                <Text style={styles.menuEmoji}>{item.emoji}</Text>
+                                <MaterialCommunityIcons name={item.icon} size={26} color="#fff" />
                             </LinearGradient>
                             <Text style={styles.menuLabel}>{item.label}</Text>
                         </TouchableOpacity>
@@ -133,12 +141,19 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: Typography.fontSize.base, fontFamily: 'Poppins-Bold', color: Colors.text.primary, marginBottom: Spacing.base, marginTop: Spacing.sm },
     kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.base },
     kpiCard: { flex: 1, minWidth: '45%', borderRadius: BorderRadius.xl, padding: Spacing['2xl'], alignItems: 'center', ...Shadows.md },
-    kpiEmoji: { fontSize: 28, marginBottom: Spacing.xs },
+    kpiIconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(255,255,255,0.25)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: Spacing.sm,
+    },
     kpiValue: { fontSize: Typography.fontSize['2xl'], fontFamily: 'Poppins-Bold', color: '#fff', marginBottom: 2 },
     kpiLabel: { fontSize: Typography.fontSize.xs, color: 'rgba(255,255,255,0.8)', textAlign: 'center' },
     menuGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
     menuItem: { flex: 1, minWidth: '22%', alignItems: 'center', marginBottom: Spacing.sm },
     menuGradient: { width: 60, height: 60, borderRadius: BorderRadius.xl, justifyContent: 'center', alignItems: 'center', marginBottom: 6, ...Shadows.md },
-    menuEmoji: { fontSize: 28 },
     menuLabel: { fontSize: Typography.fontSize.xs, fontFamily: 'Poppins-Medium', color: Colors.text.primary, textAlign: 'center' },
 });

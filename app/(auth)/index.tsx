@@ -19,27 +19,28 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
 const slides = [
     {
         id: '1',
-        emoji: '🛒',
+        icon: 'shopping-cart' as const,
         title: '10-Minute Grocery\nDelivery',
         subtitle: 'Get fresh fruits, vegetables, dairy & more delivered to your doorstep in minutes.',
         bg: ['#0C831F', '#34A853'] as const,
     },
     {
         id: '2',
-        emoji: '🏷️',
+        icon: 'local-offer' as const,
         title: 'Best Prices &\nExclusive Offers',
         subtitle: 'Save more with daily deals, coupons, and cashback offers on every order.',
         bg: ['#1565C0', '#42A5F5'] as const,
     },
     {
         id: '3',
-        emoji: '📍',
+        icon: 'location-on' as const,
         title: 'Real-Time Order\nTracking',
         subtitle: 'Track your delivery partner live on the map and know exactly when to expect your order.',
         bg: ['#6A1B9A', '#AB47BC'] as const,
@@ -90,7 +91,7 @@ export default function OnboardingScreen() {
                         </TouchableOpacity>
 
                         <View style={styles.emojiContainer}>
-                            <Text style={styles.emoji}>{item.emoji}</Text>
+                            <MaterialIcons name={item.icon} size={80} color="#fff" />
                         </View>
 
                         <View style={styles.textContainer}>
@@ -126,9 +127,16 @@ export default function OnboardingScreen() {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                     >
-                        <Text style={styles.nextText}>
-                            {activeIndex === slides.length - 1 ? 'Get Started 🚀' : 'Next →'}
-                        </Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={styles.nextText}>
+                                {activeIndex === slides.length - 1 ? 'Get Started' : 'Next'}
+                            </Text>
+                            <MaterialIcons
+                                name={activeIndex === slides.length - 1 ? 'auto-awesome' : 'arrow-forward'}
+                                size={20}
+                                color="#fff"
+                            />
+                        </View>
                     </LinearGradient>
                 </TouchableOpacity>
             </View>

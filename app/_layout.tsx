@@ -8,8 +8,7 @@ import Toast from 'react-native-toast-message';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { useAuthStore } from '@/stores/authStore';
-import { subscribeToAuthState, getUserProfile } from '@/services/auth.service';
-import { MD3LightTheme, PaperProvider, configureFonts } from 'react-native-paper';
+import { MD3LightTheme, PaperProvider } from 'react-native-paper';
 import { useState } from 'react';
 
 SplashScreen.preventAutoHideAsync();
@@ -23,16 +22,12 @@ const queryClient = new QueryClient({
     },
 });
 
-const fontConfig = {
-    fontFamily: 'Poppins-Regular',
-};
-
 const blinkitTheme = {
     ...MD3LightTheme,
     colors: {
         ...MD3LightTheme.colors,
         primary: '#F8CB46',
-        secondary: '#0C831F', // Often used for delivery estimates / money
+        secondary: '#0C831F',
         background: '#FFFFFF',
         surface: '#FFFFFF',
         text: '#000000',
@@ -40,7 +35,7 @@ const blinkitTheme = {
 };
 
 export default function RootLayout() {
-    const { setUser, setLoading, role } = useAuthStore();
+    const { setLoading } = useAuthStore();
     const [initialRoute, setInitialRoute] = useState<string | null>(null);
     const navigationState = useRootNavigationState();
 
@@ -58,32 +53,13 @@ export default function RootLayout() {
         }
     }, [fontsLoaded]);
 
+    // ── AUTH BYPASSED ────────────────────────────────────────────────────────
+    // No Firebase auth check – send everyone straight to onboarding/login.
     useEffect(() => {
-        const unsubscribe = subscribeToAuthState(async firebaseUser => {
-            if (firebaseUser) {
-                const profile = await getUserProfile(firebaseUser.uid);
-                if (profile) {
-                    setUser(profile);
-                    // Route based on role
-                    if (profile.role === 'admin') {
-                        setInitialRoute('/(admin)');
-                    } else if (profile.role === 'delivery') {
-                        setInitialRoute('/(delivery)');
-                    } else {
-                        setInitialRoute('/(user)');
-                    }
-                } else {
-                    // New user: go to profile setup
-                    setInitialRoute('/(auth)/profile-setup');
-                }
-            } else {
-                setUser(null);
-                setInitialRoute('/(auth)');
-            }
-            setLoading(false);
-        });
-        return unsubscribe;
+        setLoading(false);
+        setInitialRoute('/(auth)');
     }, []);
+    // ────────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
         if (!fontsLoaded || !navigationState?.key || !initialRoute) return;

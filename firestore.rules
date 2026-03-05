@@ -13,7 +13,8 @@ service cloud.firestore {
     }
 
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(path) ? get(path).data.role : 'none';
     }
 
     function isAdmin() {
@@ -30,10 +31,10 @@ service cloud.firestore {
 
     // === Users Collection ===
     match /users/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid);
-      allow update: if isOwner(uid) || isAdmin();
-      allow delete: if isAdmin();
+      // Basic owner check that doesn't depend on a document existing yet
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      // Admins can manage all users
+      allow read, update, delete: if isAdmin();
     }
 
     // === Products Collection ===

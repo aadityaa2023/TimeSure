@@ -17,6 +17,7 @@ import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typograp
 import { searchProducts } from '@/services/products.service';
 import { useCartStore } from '@/stores/cartStore';
 import type { Product } from '@/types';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 function useDebounce<T>(value: T, delay: number): T {
     const [debounced, setDebounced] = React.useState(value);
@@ -81,7 +82,15 @@ export default function SearchScreen() {
                     style={[styles.addBtn, inCart && styles.addBtnAdded]}
                     onPress={() => addItem(item)}
                 >
-                    <Text style={styles.addBtnText}>{inCart ? `${inCart.quantity} ✓` : '+ Add'}</Text>
+                    {inCart
+                        ? <MaterialIcons name="check" size={16} color="#fff" />
+                        : (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <MaterialIcons name="add" size={16} color={Colors.primary} />
+                                <Text style={styles.addBtnText}>Add</Text>
+                            </View>
+                        )
+                    }
                 </TouchableOpacity>
             </TouchableOpacity>
         );
@@ -91,10 +100,10 @@ export default function SearchScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.searchHeader}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Text style={styles.backText}>←</Text>
+                    <MaterialCommunityIcons name="arrow-left" size={24} color={Colors.text.primary} />
                 </TouchableOpacity>
                 <View style={styles.searchInputWrap}>
-                    <Text style={styles.searchIcon}>🔍</Text>
+                    <MaterialIcons name="search" size={18} color={Colors.text.disabled} />
                     <TextInput
                         style={styles.searchInput}
                         placeholder="Search groceries, vegetables..."
@@ -112,7 +121,7 @@ export default function SearchScreen() {
                 <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 60 }} />
             ) : searched && results.length === 0 ? (
                 <View style={styles.emptyState}>
-                    <Text style={styles.emptyEmoji}>🔍</Text>
+                    <MaterialIcons name="search" size={80} color="#BDBDBD" style={{ marginBottom: Spacing.base }} />
                     <Text style={styles.emptyTitle}>No results found</Text>
                     <Text style={styles.emptySubtitle}>Try different keywords</Text>
                 </View>
@@ -211,7 +220,6 @@ const styles = StyleSheet.create({
     },
     separator: { height: Spacing.sm },
     emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
-    emptyEmoji: { fontSize: 64, marginBottom: Spacing.base },
     emptyTitle: {
         fontSize: Typography.fontSize.xl,
         fontFamily: Typography.fontFamily.bold,

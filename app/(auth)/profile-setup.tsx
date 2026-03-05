@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 import { auth } from '@/lib/firebase';
 import { updateUserProfile } from '@/services/auth.service';
 import { uploadProfileImage } from '@/services/storage.service';
@@ -95,13 +96,15 @@ export default function ProfileSetupScreen() {
                             <Image source={{ uri: photoUri }} style={styles.avatar} contentFit="cover" />
                         ) : (
                             <LinearGradient colors={['#0C831F', '#34A853']} style={styles.avatarPlaceholder}>
-                                <Text style={styles.avatarInitial}>
-                                    {name ? name[0].toUpperCase() : '👤'}
-                                </Text>
+                                {name ? (
+                                    <Text style={styles.avatarInitial}>{name[0].toUpperCase()}</Text>
+                                ) : (
+                                    <MaterialIcons name="person" size={54} color="#fff" />
+                                )}
                             </LinearGradient>
                         )}
                         <View style={styles.cameraIcon}>
-                            <Text>📷</Text>
+                            <MaterialIcons name="camera-alt" size={18} color={Colors.text.primary} />
                         </View>
                     </TouchableOpacity>
 
@@ -148,7 +151,10 @@ export default function ProfileSetupScreen() {
                             {uploading ? (
                                 <ActivityIndicator color="#fff" />
                             ) : (
-                                <Text style={styles.saveText}>Save & Continue →</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                    <Text style={styles.saveText}>Save & Continue</Text>
+                                    <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+                                </View>
                             )}
                         </LinearGradient>
                     </TouchableOpacity>

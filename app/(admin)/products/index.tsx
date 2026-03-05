@@ -19,6 +19,7 @@ import { getProducts } from '@/services/products.service';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import type { Product } from '@/types';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function AdminProductsScreen() {
     const [search, setSearch] = useState('');
@@ -73,15 +74,19 @@ export default function AdminProductsScreen() {
             </View>
             <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionBtn} onPress={() => toggleActive(item)}>
-                    <Text style={{ fontSize: 18 }}>{item.isActive ? '✅' : '❌'}</Text>
+                    <MaterialIcons
+                        name={item.isActive ? "check-circle" : "cancel"}
+                        size={20}
+                        color={item.isActive ? Colors.primary : Colors.error}
+                    />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.actionBtn} onPress={() =>
                     router.push({ pathname: '/(admin)/products/[id]', params: { id: item.id } })
                 }>
-                    <Text style={{ fontSize: 18 }}>✏️</Text>
+                    <MaterialIcons name="edit" size={20} color={Colors.info} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.actionBtn} onPress={() => deleteProduct(item)}>
-                    <Text style={{ fontSize: 18 }}>🗑️</Text>
+                    <MaterialIcons name="delete" size={20} color={Colors.error} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -91,19 +96,22 @@ export default function AdminProductsScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backText}>←</Text>
+                    <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Products</Text>
                 <TouchableOpacity
                     style={styles.addBtn}
                     onPress={() => router.push({ pathname: '/(admin)/products/[id]', params: { id: 'new' } })}
                 >
-                    <Text style={styles.addBtnText}>+ Add</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <MaterialIcons name="add" size={18} color="#fff" />
+                        <Text style={styles.addBtnText}>Add</Text>
+                    </View>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.searchBar}>
-                <Text>🔍</Text>
+                <MaterialIcons name="search" size={20} color={Colors.text.disabled} />
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Search products..."

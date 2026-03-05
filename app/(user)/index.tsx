@@ -19,7 +19,7 @@ import { getProducts, getCategories } from '@/services/products.service';
 import { useAuthStore } from '@/stores/authStore';
 import { useCartStore } from '@/stores/cartStore';
 import type { Product, Category } from '@/types';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -73,11 +73,11 @@ function ProductCard({ product }: { product: Product }) {
                     {cartItem ? (
                         <View style={styles.qtyContainer}>
                             <TouchableOpacity onPress={() => updateQty(product.id, cartItem.quantity - 1)} style={styles.qtyBtn}>
-                                <Text style={styles.qtyBtnText}>-</Text>
+                                <MaterialIcons name="remove" size={18} color="#fff" />
                             </TouchableOpacity>
                             <Text style={styles.qtyText}>{cartItem.quantity}</Text>
                             <TouchableOpacity onPress={() => updateQty(product.id, cartItem.quantity + 1)} style={styles.qtyBtn}>
-                                <Text style={styles.qtyBtnText}>+</Text>
+                                <MaterialIcons name="add" size={18} color="#fff" />
                             </TouchableOpacity>
                         </View>
                     ) : (

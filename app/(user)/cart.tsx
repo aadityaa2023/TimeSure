@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import { useCartStore } from '@/stores/cartStore';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const DELIVERY_FEE = 30;
 const FREE_DELIVERY_THRESHOLD = 199;
@@ -55,7 +56,7 @@ export default function CartScreen() {
                     <Text style={styles.headerTitle}>My Cart</Text>
                 </View>
                 <View style={styles.emptyState}>
-                    <Text style={styles.emptyEmoji}>🛒</Text>
+                    <MaterialCommunityIcons name="cart-outline" size={90} color="#BDBDBD" style={{ marginBottom: Spacing.base }} />
                     <Text style={styles.emptyTitle}>Your cart is empty</Text>
                     <Text style={styles.emptySubtitle}>Add some fresh groceries to get started!</Text>
                     <TouchableOpacity
@@ -64,7 +65,10 @@ export default function CartScreen() {
                         activeOpacity={0.85}
                     >
                         <LinearGradient colors={['#0C831F', '#34A853']} style={styles.shopGradient}>
-                            <Text style={styles.shopBtnText}>Start Shopping →</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Text style={styles.shopBtnText}>Start Shopping</Text>
+                                <MaterialIcons name="arrow-forward" size={20} color="#fff" />
+                            </View>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
@@ -88,8 +92,9 @@ export default function CartScreen() {
                 {/* Delivery Banner */}
                 {subtotal < FREE_DELIVERY_THRESHOLD && (
                     <View style={styles.deliveryBanner}>
+                        <MaterialCommunityIcons name="truck-fast-outline" size={16} color={Colors.secondary} />
                         <Text style={styles.deliveryBannerText}>
-                            🚚 Add ₹{FREE_DELIVERY_THRESHOLD - subtotal} more for FREE delivery!
+                            {` Add ₹${FREE_DELIVERY_THRESHOLD - subtotal} more for FREE delivery!`}
                         </Text>
                     </View>
                 )}
@@ -109,14 +114,14 @@ export default function CartScreen() {
                                     style={styles.qtyBtn}
                                     onPress={() => updateQuantity(product.id, quantity - 1)}
                                 >
-                                    <Text style={styles.qtyBtnText}>−</Text>
+                                    <MaterialIcons name="remove" size={20} color="#fff" />
                                 </TouchableOpacity>
                                 <Text style={styles.qtyText}>{quantity}</Text>
                                 <TouchableOpacity
                                     style={styles.qtyBtn}
                                     onPress={() => updateQuantity(product.id, quantity + 1)}
                                 >
-                                    <Text style={styles.qtyBtnText}>+</Text>
+                                    <MaterialIcons name="add" size={20} color="#fff" />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -125,15 +130,19 @@ export default function CartScreen() {
 
                 {/* Coupon */}
                 <View style={styles.couponSection}>
-                    <Text style={styles.couponLabel}>🏷️ Apply Coupon</Text>
+                    <View style={styles.couponLabelRow}>
+                        <MaterialCommunityIcons name="tag-outline" size={18} color={Colors.text.primary} />
+                        <Text style={styles.couponLabel}>Apply Coupon</Text>
+                    </View>
                     {couponApplied ? (
                         <View style={styles.couponApplied}>
                             <View style={styles.couponAppliedLeft}>
                                 <Text style={styles.couponAppliedCode}>{coupon.toUpperCase()}</Text>
                                 <Text style={styles.couponAppliedSaving}>You saved ₹{couponDiscount.toFixed(0)}</Text>
                             </View>
-                            <TouchableOpacity onPress={removeCoupon}>
-                                <Text style={styles.couponRemove}>✕ Remove</Text>
+                            <TouchableOpacity onPress={removeCoupon} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <MaterialIcons name="close" size={16} color={Colors.error} />
+                                <Text style={styles.couponRemove}>Remove</Text>
                             </TouchableOpacity>
                         </View>
                     ) : (
@@ -209,7 +218,10 @@ export default function CartScreen() {
                     activeOpacity={0.85}
                 >
                     <LinearGradient colors={['#0C831F', '#34A853']} style={styles.checkoutGradient}>
-                        <Text style={styles.checkoutBtnText}>Proceed to Checkout →</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
+                            <MaterialIcons name="arrow-forward" size={20} color="#fff" />
+                        </View>
                     </LinearGradient>
                 </TouchableOpacity>
             </View>
@@ -232,13 +244,15 @@ const styles = StyleSheet.create({
     headerTitle: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: Colors.text.primary },
     clearText: { fontSize: Typography.fontSize.base, color: Colors.error, fontFamily: 'Poppins-Medium' },
     emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing['2xl'] },
-    emptyEmoji: { fontSize: 80, marginBottom: Spacing.base },
     emptyTitle: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: Colors.text.primary, marginBottom: Spacing.sm },
     emptySubtitle: { fontSize: Typography.fontSize.base, color: Colors.text.secondary, marginBottom: Spacing['2xl'], textAlign: 'center' },
     shopBtn: { width: '100%', borderRadius: BorderRadius.xl, overflow: 'hidden', ...Shadows.primary },
     shopGradient: { paddingVertical: Spacing.base, alignItems: 'center' },
     shopBtnText: { fontSize: Typography.fontSize.base, fontFamily: 'Poppins-SemiBold', color: '#fff' },
     deliveryBanner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
         backgroundColor: Colors.secondaryLight,
         margin: Spacing.base,
         borderRadius: BorderRadius.lg,
@@ -278,7 +292,8 @@ const styles = StyleSheet.create({
         padding: Spacing.base,
         ...Shadows.sm,
     },
-    couponLabel: { fontSize: Typography.fontSize.base, fontFamily: 'Poppins-SemiBold', color: Colors.text.primary, marginBottom: Spacing.sm },
+    couponLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: Spacing.sm },
+    couponLabel: { fontSize: Typography.fontSize.base, fontFamily: 'Poppins-SemiBold', color: Colors.text.primary },
     couponRow: { flexDirection: 'row', gap: Spacing.sm },
     couponInput: {
         flex: 1,

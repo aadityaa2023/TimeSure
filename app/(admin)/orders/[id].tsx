@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing } from '@/constants/Typography';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function AdminOrderDetail() {
     const styles = StyleSheet.create({
@@ -15,7 +16,9 @@ export default function AdminOrderDetail() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}><Text style={styles.back}>←</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
+                </TouchableOpacity>
                 <Text style={styles.title}>Order Detail</Text>
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

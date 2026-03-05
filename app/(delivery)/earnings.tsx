@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import { useAuthStore } from '@/stores/authStore';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const weeklyData = [
     { day: 'Mon', amount: 420 },
@@ -30,7 +31,10 @@ export default function EarningsScreen() {
                 <LinearGradient colors={['#1565C0', '#42A5F5']} style={styles.totalCard}>
                     <Text style={styles.totalLabel}>This Week's Total</Text>
                     <Text style={styles.totalAmount}>₹{total.toLocaleString('en-IN')}</Text>
-                    <Text style={styles.totalSubLabel}>Keep up the great work! 🚀</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Text style={styles.totalSubLabel}>Keep up the great work!</Text>
+                        <MaterialIcons name="auto-awesome" size={16} color="rgba(255,255,255,0.9)" />
+                    </View>
                 </LinearGradient>
 
                 {/* Quick Stats */}

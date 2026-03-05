@@ -17,6 +17,7 @@ import { assignDeliveryPartner, updateOrderStatus } from '@/services/orders.serv
 import { Colors } from '@/constants/Colors';
 import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typography';
 import type { Order } from '@/types';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const STATUS_COLORS: Record<string, string> = {
     pending: Colors.status.pending,
@@ -56,8 +57,14 @@ export default function AdminOrdersScreen() {
                         </Text>
                     </View>
                 </View>
-                <Text style={styles.customer}>👤 User: {order.userId.slice(-6)}</Text>
-                <Text style={styles.address} numberOfLines={1}>📍 {order.deliveryAddress.fullAddress}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+                    <MaterialIcons name="person" size={14} color={Colors.text.secondary} />
+                    <Text style={styles.customer}>User: {order.userId.slice(-6)}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: Spacing.sm }}>
+                    <MaterialIcons name="location-on" size={14} color={Colors.text.secondary} />
+                    <Text style={styles.address} numberOfLines={1}>{order.deliveryAddress.fullAddress}</Text>
+                </View>
                 <View style={styles.cardRow}>
                     <Text style={styles.total}>₹{order.total}</Text>
                     <Text style={styles.items}>{order.items.length} items · {order.paymentMethod.toUpperCase()}</Text>
@@ -78,7 +85,12 @@ export default function AdminOrdersScreen() {
                     >
                         {activating === order.id
                             ? <ActivityIndicator color="#fff" size="small" />
-                            : <Text style={styles.confirmBtnText}>✅ Confirm Order</Text>}
+                            : (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                    <MaterialIcons name="check-circle" size={16} color="#fff" />
+                                    <Text style={styles.confirmBtnText}>Confirm Order</Text>
+                                </View>
+                            )}
                     </TouchableOpacity>
                 )}
             </TouchableOpacity>
@@ -89,7 +101,7 @@ export default function AdminOrdersScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backText}>←</Text>
+                    <MaterialIcons name="arrow-back" size={24} color={Colors.text.primary} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>All Orders ({orders.length})</Text>
                 <View style={{ width: 30 }} />

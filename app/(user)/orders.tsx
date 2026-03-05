@@ -15,6 +15,7 @@ import { Typography, Spacing, BorderRadius, Shadows } from '@/constants/Typograp
 import { getUserOrders } from '@/services/orders.service';
 import { useAuthStore } from '@/stores/authStore';
 import type { Order } from '@/types';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const STATUS_COLORS: Record<string, string> = {
     pending: Colors.status.pending,
@@ -57,7 +58,8 @@ function OrderCard({ order }: { order: Order }) {
             </View>
             {order.status === 'delivered' && (
                 <TouchableOpacity style={styles.reorderBtn} activeOpacity={0.8}>
-                    <Text style={styles.reorderText}>🔄 Reorder</Text>
+                    <MaterialCommunityIcons name="refresh" size={14} color={Colors.primary} />
+                    <Text style={styles.reorderText}> Reorder</Text>
                 </TouchableOpacity>
             )}
         </TouchableOpacity>
@@ -81,11 +83,14 @@ export default function OrdersScreen() {
                 <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 60 }} />
             ) : orders.length === 0 ? (
                 <View style={styles.emptyState}>
-                    <Text style={styles.emptyEmoji}>📦</Text>
+                    <MaterialCommunityIcons name="package-variant" size={80} color="#BDBDBD" style={{ marginBottom: Spacing.base }} />
                     <Text style={styles.emptyTitle}>No orders yet</Text>
                     <Text style={styles.emptySubtitle}>Start shopping and your orders will appear here</Text>
                     <TouchableOpacity style={styles.shopBtn} onPress={() => router.replace('/(user)')}>
-                        <Text style={styles.shopBtnText}>Start Shopping →</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={styles.shopBtnText}>Start Shopping</Text>
+                            <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+                        </View>
                     </TouchableOpacity>
                 </View>
             ) : (
@@ -128,16 +133,17 @@ const styles = StyleSheet.create({
     dateText: { fontSize: Typography.fontSize.sm, color: Colors.text.disabled },
     totalText: { fontSize: Typography.fontSize.lg, fontFamily: 'Poppins-Bold', color: Colors.text.primary },
     reorderBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         marginTop: Spacing.base,
         paddingVertical: 6,
         borderWidth: 1.5,
         borderColor: Colors.primary,
         borderRadius: BorderRadius.md,
-        alignItems: 'center',
     },
     reorderText: { fontSize: Typography.fontSize.sm, fontFamily: 'Poppins-SemiBold', color: Colors.primary },
     emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing['2xl'] },
-    emptyEmoji: { fontSize: 64, marginBottom: Spacing.base },
     emptyTitle: { fontSize: Typography.fontSize.xl, fontFamily: 'Poppins-Bold', color: Colors.text.primary, marginBottom: Spacing.sm },
     emptySubtitle: { fontSize: Typography.fontSize.base, color: Colors.text.secondary, textAlign: 'center', marginBottom: Spacing['2xl'] },
     shopBtn: { backgroundColor: Colors.primary, borderRadius: BorderRadius.xl, paddingVertical: Spacing.base, paddingHorizontal: Spacing['2xl'] },
