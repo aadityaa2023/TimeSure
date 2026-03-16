@@ -91,6 +91,26 @@ export default function UserTabLayout() {
                     ),
                 }}
             />
+
+            {/* Hidden tabs */}
+            <Tabs.Screen
+                name="checkout"
+                options={{
+                    href: null,
+                }}
+            />
+            <Tabs.Screen
+                name="order/[id]"
+                options={{
+                    href: null,
+                }}
+            />
+            <Tabs.Screen
+                name="product/[id]"
+                options={{
+                    href: null,
+                }}
+            />
         </Tabs>
     );
 }
