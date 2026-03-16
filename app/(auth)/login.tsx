@@ -96,7 +96,7 @@ export default function LoginScreen() {
                             <MaterialIcons name="flash-on" size={48} color="#fff" />
                         </LinearGradient>
                         <Text style={styles.appName}>TimeSure</Text>
-                        <Text style={styles.tagline}>Delivery in 10 minutes</Text>
+                        <Text style={styles.tagline}>Fast & Reliable Delivery</Text>
                     </View>
 
                     {/* Dev login notice */}

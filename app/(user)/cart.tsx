@@ -57,8 +57,7 @@ export default function CartScreen() {
                 </View>
                 <View style={styles.emptyState}>
                     <MaterialCommunityIcons name="cart-outline" size={90} color="#BDBDBD" style={{ marginBottom: Spacing.base }} />
-                    <Text style={styles.emptyTitle}>Your cart is empty</Text>
-                    <Text style={styles.emptySubtitle}>Add some fresh groceries to get started!</Text>
+                    <Text style={styles.emptySubtitle}>Add some items to get started!</Text>
                     <TouchableOpacity
                         style={styles.shopBtn}
                         onPress={() => router.replace('/(user)')}

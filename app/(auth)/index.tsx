@@ -28,8 +28,8 @@ const slides = [
     {
         id: '1',
         icon: 'shopping-cart' as const,
-        title: '10-Minute Grocery\nDelivery',
-        subtitle: 'Get fresh fruits, vegetables, dairy & more delivered to your doorstep in minutes.',
+        title: 'Premium Ecommerce\nPlatform',
+        subtitle: 'Shop top-quality products across multiple categories delivered right to your door.',
         bg: ['#0C831F', '#34A853'] as const,
     },
     {

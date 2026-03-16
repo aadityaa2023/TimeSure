@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -22,15 +22,16 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
-const adminMenuItems: { icon: IconName; label: string; route: string | null; gradient: readonly [string, string] }[] = [
+const adminMenuItems: { icon: IconName; label: string; route: string; gradient: readonly [string, string] }[] = [
     { icon: 'package-variant-closed', label: 'Products', route: '/(admin)/products/index', gradient: ['#0C831F', '#34A853'] },
     { icon: 'shape', label: 'Categories', route: '/(admin)/categories/index', gradient: ['#1565C0', '#42A5F5'] },
     { icon: 'clipboard-list', label: 'Orders', route: '/(admin)/orders/index', gradient: ['#7B1FA2', '#AB47BC'] },
-    { icon: 'moped', label: 'Delivery Partners', route: null, gradient: ['#E65100', '#FF7043'] },
+    { icon: 'moped', label: 'Delivery', route: '/(admin)/delivery-partners/index', gradient: ['#E65100', '#FF7043'] },
     { icon: 'account-group', label: 'Users', route: '/(admin)/users', gradient: ['#00695C', '#26A69A'] },
     { icon: 'ticket-percent', label: 'Coupons', route: '/(admin)/coupons/index', gradient: ['#AD1457', '#F06292'] },
     { icon: 'chart-bar', label: 'Analytics', route: '/(admin)/analytics', gradient: ['#1A237E', '#3F51B5'] },
-    { icon: 'bell-ring', label: 'Notifications', route: null, gradient: ['#BF360C', '#FF7043'] },
+    { icon: 'bell-ring', label: 'Notify', route: '/(admin)/notifications/index', gradient: ['#BF360C', '#FF7043'] },
+    { icon: 'image-multiple', label: 'Banners', route: '/(admin)/banners/index', gradient: ['#4527A0', '#7E57C2'] },
 ];
 
 function KPICard({ label, value, icon, gradient }: { label: string; value: string; icon: IconName; gradient: readonly [string, string] }) {
@@ -124,7 +125,7 @@ export default function AdminDashboard() {
                                     styles.menuItem,
                                     Platform.OS === 'web' && { cursor: 'pointer' } as any
                                 ]}
-                                onPress={() => item.route ? router.push(item.route as any) : null}
+                                onPress={() => router.push(item.route as any)}
                                 activeOpacity={0.85}
                             >
                                 <LinearGradient colors={item.gradient} style={styles.menuGradient}>

@@ -24,9 +24,9 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 
 const banners = [
-    { id: '1', color: '#1A237E', text: 'Daily \nEssentials', subtext: 'Get 20% OFF' },
-    { id: '2', color: '#E65100', text: 'Fresh \nFruits', subtext: 'Starting ₹49' },
-    { id: '3', color: '#004D40', text: 'Morning \nDairy', subtext: 'Farm Fresh' },
+    { id: '1', color: '#1A237E', text: 'Top \nElectronics', subtext: 'Get 20% OFF' },
+    { id: '2', color: '#E65100', text: 'Fashion \nDeals', subtext: 'Starting ₹499' },
+    { id: '3', color: '#004D40', text: 'Home \nDecor', subtext: 'Premium Quality' },
 ];
 
 function ProductCard({ product }: { product: Product }) {
@@ -55,9 +55,9 @@ function ProductCard({ product }: { product: Product }) {
             </TouchableOpacity>
 
             <View style={styles.productInfo}>
-                <View style={styles.timerRow}>
-                    <MaterialCommunityIcons name="clock-fast" size={12} color="#0C831F" />
-                    <Text style={styles.timerText}>8 MINS</Text>
+                <View style={[styles.timerRow, { backgroundColor: '#E3F2FD' }]}>
+                    <MaterialCommunityIcons name="truck-delivery" size={14} color="#1976D2" />
+                    <Text style={[styles.timerText, { color: '#1976D2' }]}>FREE DELIVERY</Text>
                 </View>
                 <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
                 <Text style={styles.productUnit}>{product.unit}</Text>
@@ -138,7 +138,7 @@ export default function HomeScreen() {
             <View style={styles.header}>
                 <View style={styles.headerTop}>
                     <View style={styles.locationContainer}>
-                        <Text style={styles.deliveryTitle}>Delivery in 8 minutes</Text>
+                        <Text style={styles.deliveryTitle}>Deliver to</Text>
                         <TouchableOpacity style={styles.addressRow}>
                             <Text style={styles.addressText} numberOfLines={1}>
                                 {user?.addresses?.[0]?.fullAddress || 'Setup your location'}
@@ -153,7 +153,7 @@ export default function HomeScreen() {
 
                 <TouchableOpacity activeOpacity={0.9} onPress={() => router.push('/(user)/search')}>
                     <Searchbar
-                        placeholder='Search "milk"'
+                        placeholder='Search products...'
                         onChangeText={setSearchQuery}
                         value={searchQuery}
                         editable={false}
