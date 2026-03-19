@@ -127,7 +127,6 @@ export default function AdminBannersScreen() {
                 source={{ uri: item.imageUrl }}
                 style={styles.bannerPreview}
                 contentFit="cover"
-                placeholder={{ color: Colors.border }}
             />
             <View style={styles.bannerMeta}>
                 <View style={{ flex: 1 }}>

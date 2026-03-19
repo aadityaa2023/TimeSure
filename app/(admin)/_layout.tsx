@@ -20,7 +20,6 @@ export default function AdminLayout() {
             <Stack.Screen name="delivery-partners/index" />
             <Stack.Screen name="notifications/index" />
             <Stack.Screen name="banners/index" />
-            <Stack.Screen name="banners/index" />
         </Stack>
     );
 }
