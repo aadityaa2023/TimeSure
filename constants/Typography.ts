@@ -58,33 +58,24 @@ export const BorderRadius = {
     full: 9999,
 } as const;
 
+const getShadow = (color: string, offset: { width: number; height: number }, opacity: number, radius: number, elevation: number) => {
+    if (Platform.OS === 'web') {
+        return {
+            boxShadow: `${offset.width}px ${offset.height}px ${radius}px rgba(${parseInt(color.slice(1, 3), 16)}, ${parseInt(color.slice(3, 5), 16)}, ${parseInt(color.slice(5, 7), 16)}, ${opacity})`,
+        };
+    }
+    return {
+        shadowColor: color,
+        shadowOffset: offset,
+        shadowOpacity: opacity,
+        shadowRadius: radius,
+        elevation,
+    };
+};
+
 export const Shadows = {
-    sm: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 3,
-        elevation: 2,
-    },
-    md: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-        elevation: 4,
-    },
-    lg: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 12,
-        elevation: 8,
-    },
-    primary: {
-        shadowColor: '#0C831F',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-        elevation: 8,
-    },
+    sm: getShadow('#000000', { width: 0, height: 1 }, 0.05, 3, 2),
+    md: getShadow('#000000', { width: 0, height: 2 }, 0.08, 6, 4),
+    lg: getShadow('#000000', { width: 0, height: 4 }, 0.12, 12, 8),
+    primary: getShadow('#0C831F', { width: 0, height: 4 }, 0.3, 12, 8),
 } as const;
